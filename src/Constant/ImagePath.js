@@ -24,4 +24,6 @@ export const ImagesPath = {
     notificationWhiteImage: require(`../Assests/Images/notificationWhiteImage.webp`),
     userWhiteImage: require(`../Assests/Images/userWhiteImage.jpg`),
     threeDot: require(`../Assests/Images/threeDot.png`),
+    upload: require(`../Assests/Images/upload.png`),
+    crossAlertIcon: require(`../Assests/Images/crossAlertIcon.png`),
 }
