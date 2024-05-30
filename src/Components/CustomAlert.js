@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Image, Switch } from '
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
 
-const CustomAlert = ({ visible, onClose, data }) => {
+const CustomAlert = ({ visible, onClose, data, datas }) => {
     const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
     const [pushNotificationEnabled1, setPushNotificationEnabled1] = useState(false);
     const [pushNotificationEnabled2, setPushNotificationEnabled2] = useState(false);
@@ -42,72 +42,106 @@ const CustomAlert = ({ visible, onClose, data }) => {
         setPushNotificationEnabled5(previousState => !previousState);
     };
 
+
+
+    const renderContent = () => {
+        switch (datas) {
+            case 'users':
+                return (
+                    <View style={styles.alertContainer}>
+                        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                            <Image source={ImagesPath.crossAlertIcon} style={styles.closeIcon} />
+                        </TouchableOpacity>
+                        <View style={styles.content}>
+                            <Text style={styles.nameText}>{data?.name}</Text>
+                            <Text style={styles.emailText}>{data?.email}</Text>
+                        </View>
+                        <View style={styles.pushNotification}>
+                            <Text style={styles.notificationText}>Subscribed to Binary Premium Signals?</Text>
+                            <Switch
+                                value={pushNotificationEnabled}
+                                onValueChange={handleToggleSwitch}
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={pushNotificationEnabled ? "#f5dd4b" : "#f4f3f4"}
+                            />
+                        </View>
+                        <View style={styles.pushNotification}>
+                            <Text style={styles.notificationText}>Subscribed to Forex Premium Signals?</Text>
+                            <Switch
+                                value={pushNotificationEnabled1}
+                                onValueChange={handleToggleSwitch1}
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={pushNotificationEnabled1 ? "#f5dd4b" : "#f4f3f4"}
+                            />
+                        </View>
+                        <View style={styles.pushNotification}>
+                            <Text style={styles.notificationText}>Give Binary Premium Signals Forcefully</Text>
+                            <Switch
+                                value={pushNotificationEnabled2}
+                                onValueChange={handleToggleSwitch2}
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={pushNotificationEnabled2 ? "#f5dd4b" : "#f4f3f4"}
+                            />
+                        </View>
+                        <View style={styles.pushNotification}>
+                            <Text style={styles.notificationText}>Give Forex Premium Signals Forcefully</Text>
+                            <Switch
+                                value={pushNotificationEnabled3}
+                                onValueChange={handleToggleSwitch3}
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={pushNotificationEnabled3 ? "#f5dd4b" : "#f4f3f4"}
+                            />
+                        </View>
+                        <View style={styles.pushNotification}>
+                            <Text style={styles.notificationText}>Purchased Action Book</Text>
+                            <Switch
+                                value={pushNotificationEnabled4}
+                                onValueChange={handleToggleSwitch4}
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={pushNotificationEnabled4 ? "#f5dd4b" : "#f4f3f4"}
+                            />
+                        </View>
+                        <View style={styles.pushNotification}>
+                            <Text style={styles.notificationText}>Purchased Paid Course</Text>
+                            <Switch
+                                value={pushNotificationEnabled5}
+                                onValueChange={handleToggleSwitch5}
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={pushNotificationEnabled5 ? "#f5dd4b" : "#f4f3f4"}
+                            />
+                        </View>
+                    </View>
+                )
+            case 'contactUs':
+                return (
+                    <>
+                        <View style={styles.alertContainer}>
+                            <TouchableOpacity onPress={onClose}>
+                                <Image source={ImagesPath.crossAlertIcon} style={styles.closeIcon} />
+                            </TouchableOpacity>
+                            <View style={styles.contactContainer}>
+                                <Text style={styles.contactText}>Contact us on Telegram or do live chat with us</Text>
+                                <View style={styles.contactOptions}>
+                                    <TouchableOpacity style={styles.contactOptionButton}>
+                                        <Text style={styles.contactOptionText}>TELEGRAM</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.contactOptionButton}>
+                                        <Text style={styles.contactOptionText}>LIVE CHAT</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </>
+                )
+            default:
+                return null;
+        }
+    }
+
     return (
         <Modal transparent animationType="slide" visible={visible}>
             <View style={styles.modalContainer}>
-                <View style={styles.alertContainer}>
-                    <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                        <Image source={ImagesPath.crossAlertIcon} style={styles.closeIcon} />
-                    </TouchableOpacity>
-                    <View style={styles.content}>
-                        <Text style={styles.nameText}>{data?.name}</Text>
-                        <Text style={styles.emailText}>{data?.email}</Text>
-                    </View>
-                    <View style={styles.pushNotification}>
-                        <Text style={styles.notificationText}>Subscribed to Binary Premium Signals?</Text>
-                        <Switch
-                            value={pushNotificationEnabled}
-                            onValueChange={handleToggleSwitch}
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={pushNotificationEnabled ? "#f5dd4b" : "#f4f3f4"}
-                        />
-                    </View>
-                    <View style={styles.pushNotification}>
-                        <Text style={styles.notificationText}>Subscribed to Forex Premium Signals?</Text>
-                        <Switch
-                            value={pushNotificationEnabled1}
-                            onValueChange={handleToggleSwitch1}
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={pushNotificationEnabled1 ? "#f5dd4b" : "#f4f3f4"}
-                        />
-                    </View>
-                    <View style={styles.pushNotification}>
-                        <Text style={styles.notificationText}>Give Binary Premium Signals Forcefully</Text>
-                        <Switch
-                            value={pushNotificationEnabled2}
-                            onValueChange={handleToggleSwitch2}
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={pushNotificationEnabled2 ? "#f5dd4b" : "#f4f3f4"}
-                        />
-                    </View>
-                    <View style={styles.pushNotification}>
-                        <Text style={styles.notificationText}>Give Forex Premium Signals Forcefully</Text>
-                        <Switch
-                            value={pushNotificationEnabled3}
-                            onValueChange={handleToggleSwitch3}
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={pushNotificationEnabled3 ? "#f5dd4b" : "#f4f3f4"}
-                        />
-                    </View>
-                    <View style={styles.pushNotification}>
-                        <Text style={styles.notificationText}>Purchased Action Book</Text>
-                        <Switch
-                            value={pushNotificationEnabled4}
-                            onValueChange={handleToggleSwitch4}
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={pushNotificationEnabled4 ? "#f5dd4b" : "#f4f3f4"}
-                        />
-                    </View>
-                    <View style={styles.pushNotification}>
-                        <Text style={styles.notificationText}>Purchased Paid Course</Text>
-                        <Switch
-                            value={pushNotificationEnabled5}
-                            onValueChange={handleToggleSwitch5}
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={pushNotificationEnabled5 ? "#f5dd4b" : "#f4f3f4"}
-                        />
-                    </View>
-                </View>
+                {renderContent()}
             </View>
         </Modal>
     );
@@ -157,7 +191,34 @@ const styles = StyleSheet.create({
     },
     notificationText: {
         color: AppColors.PrimaryBlack
-    }
+    },
+    contactContainer: {
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    contactText: {
+        fontSize: 16,
+        color: 'black',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    contactOptions: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    contactOptionButton: {
+        backgroundColor: '#007bff',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginHorizontal: 5,
+    },
+    contactOptionText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+
 });
 
 export default CustomAlert;

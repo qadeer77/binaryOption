@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, ScrollView } from 'react-native';
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
 import DrawerScreen from '../Components/Drawer';
 import HomeChild from '../Components/HomeChild';
+import CustomAlert from '../Components/CustomAlert';
 
 const Home = ({ navigation }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isShow, setIsShow] = useState(false);
+    const [isAlert, setIsAlert] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const drawerAnimatedValue = useRef(new Animated.Value(0)).current;
 
@@ -37,12 +39,22 @@ const Home = ({ navigation }) => {
         { id: 4, image: ImagesPath.VideoCourse, text: 'Video Course' },
         { id: 5, image: ImagesPath.liveCourse, text: 'Live Course' },
         { id: 6, image: ImagesPath.FollowUs, text: 'Follow Us' },
+        { id: 7, image: ImagesPath.contactUs, text: 'Contact Us' },
     ];
 
 
+    const handleClose = () => {
+        setIsAlert(false)
+    }
+
+
     const handleBox = (item) => {
-        setSelectedItem(item);
-        setIsShow(!isShow);
+        if (item.text === 'Contact Us') {
+            setIsAlert(true)
+        } else {
+            setSelectedItem(item);
+            setIsShow(!isShow);
+        }
     };
 
     return (
@@ -50,26 +62,29 @@ const Home = ({ navigation }) => {
             {isDrawerOpen ? (
                 <DrawerScreen onClose={handleHemberger} drawerTranslate={drawerTranslateX} />
             ) : isShow ? (
-                <HomeChild onClose={handleBox} data={selectedItem}/>
+                <HomeChild onClose={handleBox} data={selectedItem} />
             ) : (
                 <>
-                    <View style={styles.header}>
-                        <TouchableOpacity style={styles.menuIcon} onPress={handleHemberger}>
-                            <Image source={ImagesPath.hemberger} />
-                        </TouchableOpacity>
-                        <Text style={styles.headerText}>Binary & Fx Signals</Text>
-                    </View>
-                    <View style={styles.container}>
-                        {data.map(item => (
-                            <TouchableOpacity key={item.id} style={styles.box} onPress={() => handleBox(item)}>
-                                <Image
-                                    source={item.image}
-                                    style={styles.image}
-                                />
-                                <Text style={styles.boxText}>{item.text}</Text>
+                    <ScrollView>
+                        <View style={styles.header}>
+                            <TouchableOpacity style={styles.menuIcon} onPress={handleHemberger}>
+                                <Image source={ImagesPath.hemberger} />
                             </TouchableOpacity>
-                        ))}
-                    </View>
+                            <Text style={styles.headerText}>Binary & Fx Signals</Text>
+                        </View>
+                        <View style={styles.container}>
+                            {data.map(item => (
+                                <TouchableOpacity key={item.id} style={styles.box} onPress={() => handleBox(item)}>
+                                    <Image
+                                        source={item.image}
+                                        style={styles.image}
+                                    />
+                                    <Text style={styles.boxText}>{item.text}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </ScrollView>
+                    {isAlert && <CustomAlert datas={'contactUs'} onClose={handleClose}/>}
                 </>
             )}
         </>

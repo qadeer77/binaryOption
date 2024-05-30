@@ -9,9 +9,9 @@ const FxAlert = ({ navigation }) => {
         <>
             <View style={styles.header}>
                 <Text style={styles.headerText}>Fx Alert</Text>
-                <TouchableOpacity style={styles.menuIcon}>
+                {/* <TouchableOpacity style={styles.menuIcon}>
                     <Image source={ImagesPath.threeDot} style={{ width: 30, height: 30 }} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         </>
     );

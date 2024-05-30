@@ -57,7 +57,7 @@ const Users = ({ navigation }) => {
                 )}
                 ListEmptyComponent={<Text style={styles.noResultsText}>No results found</Text>}
             />
-            {IsShow && <CustomAlert data={IsUsers} onClose={handleUserPress}/>}
+            {IsShow && <CustomAlert data={IsUsers} onClose={handleUserPress} datas={'users'}/>}
         </>
     );
 };

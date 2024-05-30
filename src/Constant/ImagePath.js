@@ -26,4 +26,5 @@ export const ImagesPath = {
     threeDot: require(`../Assests/Images/threeDot.png`),
     upload: require(`../Assests/Images/upload.png`),
     crossAlertIcon: require(`../Assests/Images/crossAlertIcon.png`),
+    contactUs: require(`../Assests/Images/contact-Us.png`),
 }

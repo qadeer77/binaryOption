@@ -14,6 +14,7 @@ const FxSignals = ({ navigation }) => {
     const [checked3, setChecked3] = useState(false);
     const [checked4, setChecked4] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [showTooltip, setShowTooltip] = useState(false);
 
 
     const UploadImage = () => {
@@ -36,14 +37,34 @@ const FxSignals = ({ navigation }) => {
         });
     };
 
+
+    const handleThreeDot = () => {
+        setShowTooltip(!showTooltip);
+    }
+
+
+    const handleChat = () => {
+        
+    }
+
     return (
         <ScrollView>
             <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.headerText}>Fx Signals</Text>
-                    <TouchableOpacity style={styles.menuIcon}>
+                    <TouchableOpacity style={styles.menuIcon} onPress={handleThreeDot}>
                         <Image source={ImagesPath.threeDot} style={{ width: 30, height: 30 }} />
                     </TouchableOpacity>
+                    {showTooltip && (
+                        <View style={styles.tooltip}>
+                            <TouchableOpacity style={styles.tooltipOption} onPress={handleChat}>
+                                <Text style={styles.tooltipText}>Chat</Text>
+                            </TouchableOpacity>
+                            {/* <TouchableOpacity style={styles.tooltipOption}>
+                                <Text style={styles.tooltipText}>Option 2</Text>
+                            </TouchableOpacity> */}
+                        </View>
+                    )}
                 </View>
                 <View style={styles.content}>
                     <Text style={styles.sendNotificationText}>Send Notification</Text>
@@ -240,6 +261,30 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         resizeMode: 'cover',
+    },
+    tooltip: {
+        position: 'absolute',
+        backgroundColor: 'white',
+        top: 20,
+        right: 70,
+        borderRadius: 10,
+        padding: 5,
+        // shadowColor: '#000',
+        // shadowOffset: {
+        //     width: 0,
+        //     height: 2,
+        // },
+        // shadowOpacity: 0.25,
+        // shadowRadius: 3.84,
+        // elevation: 5,
+        zIndex: 2,
+    },
+    tooltipOption: {
+        padding: 10,
+    },
+    tooltipText: {
+        fontSize: 16,
+        color: AppColors.PrimaryBlack
     },
 });
 
