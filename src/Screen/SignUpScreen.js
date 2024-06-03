@@ -3,6 +3,8 @@ import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, TouchableWi
 import { ImagesPath } from '../Constant/ImagePath';
 import { AppColors } from '../Constant/AppColor';
 import Toast from 'react-native-simple-toast';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignupScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -10,6 +12,7 @@ const SignupScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false)
 
 
     const showToast = (text) => {
@@ -23,9 +26,28 @@ const SignupScreen = ({ navigation }) => {
 
     const handleRegister = async () => {
         if (validateInputs()) {
-            navigation.replace('home')
+            setLoading(true);
+            try {
+                await auth().createUserWithEmailAndPassword(username, password);
+                console.log('User account created & signed in!');
+                navigation.replace('home');
+                showToast('signUp successful');
+                await AsyncStorage.setItem("isLoggedIn", "true");
+            } catch (error) {
+                if (error.code === 'auth/email-already-in-use') {
+                    console.log('That email address is already in use!');
+                    showToast('That email address is already in use!')
+                } else if (error.code === 'auth/invalid-email') {
+                    console.log('That email address is invalid!');
+                } else {
+                    console.error(error);
+                }
+            } finally {
+                setLoading(false);
+            }
         }
-    }
+    };
+
 
     const validateInputs = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,85 +77,91 @@ const SignupScreen = ({ navigation }) => {
 
     return (
         <>
-            <ScrollView>
-                <View style={styles.container}>
-                    <View style={styles.overlay}>
-                        <Image source={ImagesPath.images} style={styles.image} />
-                        <View style={styles.overlaySub}>
-                            <Text style={styles.text}>REGISTER</Text>
-                            <Image source={ImagesPath.HRP} style={styles.centeredImage} />
-                        </View>
-                    </View>
-                    <View style={styles.inputContainer}>
-                        <View style={styles.inputWrapper}>
-                            <Text style={styles.label}>Email</Text>
-                            <TextInput
-                                style={[styles.input, { color: AppColors.PrimaryBlack }]}
-                                placeholder="Enter your email"
-                                keyboardType="email-address"
-                                placeholderTextColor={AppColors.PrimaryBlack}
-                                value={username}
-                                onChangeText={(text) => setUsername(text.trim())}
-                            />
-                        </View>
-                        <View style={styles.inputWrapper}>
-                            <Text style={styles.label}>Password</Text>
-                            <TextInput
-                                style={[styles.input, { color: AppColors.PrimaryBlack }]}
-                                placeholder="Enter your password"
-                                secureTextEntry={!showPassword}
-                                placeholderTextColor={AppColors.PrimaryBlack}
-                                value={password}
-                                onChangeText={(text) => setPassword(text.trim())}
-                            />
-                            <TouchableOpacity
-                                style={styles.passwordToggle}
-                                onPress={() => setShowPassword(!showPassword)}
-                            >
-                                <Image source={showPassword ? ImagesPath.eyeImage : ImagesPath.eyeSlashImage} />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.inputWrapper}>
-                            <Text style={styles.label}>Confirm Password</Text>
-                            <TextInput
-                                style={[styles.input, { color: AppColors.PrimaryBlack }]}
-                                placeholder="Enter your confirm password"
-                                secureTextEntry={!showConfirmPassword}
-                                placeholderTextColor={AppColors.PrimaryBlack}
-                                value={confirmPassword}
-                                onChangeText={(text) => setConfirmPassword(text.trim())}
-                            />
-                            <TouchableOpacity
-                                style={styles.passwordToggle}
-                                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                            >
-                                <Image source={showConfirmPassword ? ImagesPath.eyeImage : ImagesPath.eyeSlashImage} />
-                            </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity
-                            style={styles.loginButton}
-                            onPress={handleRegister}
-                        >
-                            <Text style={styles.loginButtonText}>REGISTER</Text>
-                        </TouchableOpacity>
-                        <Text style={{ color: AppColors.PrimaryBlack, textAlign: 'center', top: 20 }}>Or SignUp in with</Text>
-                        <View style={styles.googleContainer}>
-                            <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
-                                <Image source={ImagesPath.GoogleImages} style={styles.loginImages} />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
-                                <Image source={ImagesPath.facebookImages} style={styles.loginImages} />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.registerTextContainer}>
-                            <Text style={styles.registerText}>Already have an account?</Text>
-                            <TouchableOpacity onPress={handleLogin}>
-                                <Text style={styles.registerLink}> Login</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+            {loading ? (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
                 </View>
-            </ScrollView>
+            ) : (
+                <ScrollView>
+                    <View style={styles.container}>
+                        <View style={styles.overlay}>
+                            <Image source={ImagesPath.images} style={styles.image} />
+                            <View style={styles.overlaySub}>
+                                <Text style={styles.text}>REGISTER</Text>
+                                <Image source={ImagesPath.HRP} style={styles.centeredImage} />
+                            </View>
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <View style={styles.inputWrapper}>
+                                <Text style={styles.label}>Email</Text>
+                                <TextInput
+                                    style={[styles.input, { color: AppColors.PrimaryBlack }]}
+                                    placeholder="Enter your email"
+                                    keyboardType="email-address"
+                                    placeholderTextColor={AppColors.PrimaryBlack}
+                                    value={username}
+                                    onChangeText={(text) => setUsername(text.trim())}
+                                />
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Text style={styles.label}>Password</Text>
+                                <TextInput
+                                    style={[styles.input, { color: AppColors.PrimaryBlack }]}
+                                    placeholder="Enter your password"
+                                    secureTextEntry={!showPassword}
+                                    placeholderTextColor={AppColors.PrimaryBlack}
+                                    value={password}
+                                    onChangeText={(text) => setPassword(text.trim())}
+                                />
+                                <TouchableOpacity
+                                    style={styles.passwordToggle}
+                                    onPress={() => setShowPassword(!showPassword)}
+                                >
+                                    <Image source={showPassword ? ImagesPath.eyeImage : ImagesPath.eyeSlashImage} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Text style={styles.label}>Confirm Password</Text>
+                                <TextInput
+                                    style={[styles.input, { color: AppColors.PrimaryBlack }]}
+                                    placeholder="Enter your confirm password"
+                                    secureTextEntry={!showConfirmPassword}
+                                    placeholderTextColor={AppColors.PrimaryBlack}
+                                    value={confirmPassword}
+                                    onChangeText={(text) => setConfirmPassword(text.trim())}
+                                />
+                                <TouchableOpacity
+                                    style={styles.passwordToggle}
+                                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    <Image source={showConfirmPassword ? ImagesPath.eyeImage : ImagesPath.eyeSlashImage} />
+                                </TouchableOpacity>
+                            </View>
+                            <TouchableOpacity
+                                style={styles.loginButton}
+                                onPress={handleRegister}
+                            >
+                                <Text style={styles.loginButtonText}>REGISTER</Text>
+                            </TouchableOpacity>
+                            <Text style={{ color: AppColors.PrimaryBlack, textAlign: 'center', top: 20 }}>Or SignUp in with</Text>
+                            <View style={styles.googleContainer}>
+                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
+                                    <Image source={ImagesPath.GoogleImages} style={styles.loginImages} />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
+                                    <Image source={ImagesPath.facebookImages} style={styles.loginImages} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.registerTextContainer}>
+                                <Text style={styles.registerText}>Already have an account?</Text>
+                                <TouchableOpacity onPress={handleLogin}>
+                                    <Text style={styles.registerLink}> Login</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
+            )}
         </>
     );
 };
@@ -152,6 +180,13 @@ const styles = StyleSheet.create({
     },
     overlaySub: {
         marginTop: 100
+    },
+    loaderContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        zIndex: 1,
     },
     text: {
         fontSize: 50,

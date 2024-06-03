@@ -1,4 +1,4 @@
-package com.biometricauthentication
+package com.lordsofbinary.binaryoptioncourse
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

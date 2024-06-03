@@ -75,9 +75,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.biometricauthentication"
+    namespace "com.lordsofbinary.binaryoptioncourse"
     defaultConfig {
-        applicationId "com.biometricauthentication"
+        applicationId "com.lordsofbinary.binaryoptioncourse"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,4 +1,4 @@
-package com.biometricauthentication
+package com.lordsofbinary.binaryoptioncourse
 
 import android.app.Application
 import com.facebook.react.PackageList

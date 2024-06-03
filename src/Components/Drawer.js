@@ -2,8 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, Text, TouchableOpacity, Animated, ScrollView, Linking } from 'react-native';
 import { ImagesPath } from '../Constant/ImagePath';
 import { AppColors } from '../Constant/AppColor';
+import auth from '@react-native-firebase/auth';
+import Toast from 'react-native-simple-toast';
+import { useNavigation } from '@react-navigation/native';
 
-const DrawerScreen = ({ navigation, onClose, drawerTranslate }) => {
+const DrawerScreen = ({ onClose, drawerTranslate }) => {
+    const navigation = useNavigation();
+
+    const handleLogOut = () => {
+        auth()
+            .signOut()
+            .then(async () => {
+                Toast.show("Logout successful!", Toast.LONG);
+                navigation.replace('login')
+            }).catch((error) => {
+                console.log("Error logging out:", error);
+            });
+    }
 
     return (
         <>
@@ -43,7 +58,7 @@ const DrawerScreen = ({ navigation, onClose, drawerTranslate }) => {
                             </TouchableOpacity>
                             <View style={styles.grayLine}></View>
                             <Text style={{ color: "gray", fontSize: 15 }}>Account</Text>
-                            <TouchableOpacity style={[styles.contentContainer, { marginTop: 20 }]}>
+                            <TouchableOpacity style={[styles.contentContainer, { marginTop: 20 }]} onPress={handleLogOut}>
                                 <Image source={ImagesPath.Logout} style={styles.image1} />
                                 <View style={{ marginLeft: 15 }}>
                                     <Text style={styles.text}>LogOut</Text>
