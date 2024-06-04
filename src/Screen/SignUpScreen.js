@@ -5,6 +5,8 @@ import { AppColors } from '../Constant/AppColor';
 import Toast from 'react-native-simple-toast';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 
 const SignupScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +16,11 @@ const SignupScreen = ({ navigation }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false)
 
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: '746230465058-7dv30s5ih01fjcb64bq6us2a1a0af6cb.apps.googleusercontent.com',
+        });
+    }, []);
 
     const showToast = (text) => {
         Toast.show(text, Toast.LONG);
@@ -72,6 +79,47 @@ const SignupScreen = ({ navigation }) => {
         }
         else {
             return true;
+        }
+    };
+
+    const handleGoogle = async () => {
+        try {
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            const { idToken } = await GoogleSignin.signIn();
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            await auth().signInWithCredential(googleCredential);
+            showToast('Google Sign-In successful');
+            navigation.replace('home');
+            await AsyncStorage.setItem("isLoggedIn", "true");
+        } catch (error) {
+            console.log("error=====>>>> ", error);
+        }
+    }
+
+    const handleFacebook = async () => {
+        try {
+            const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+
+            if (result.isCancelled) {
+                showToast('Facebook Sign-In cancelled');
+                return;
+            }
+
+            const data = await AccessToken.getCurrentAccessToken();
+
+            if (!data) {
+                showToast('Something went wrong obtaining access token');
+                return;
+            }
+
+            const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+            await auth().signInWithCredential(facebookCredential);
+            showToast('Facebook Sign-In successful');
+            navigation.replace('home');
+            await AsyncStorage.setItem("isLoggedIn", "true");
+        } catch (error) {
+            console.log("error=====>>>> ", error);
+            showToast('Facebook Sign-In failed');
         }
     };
 
@@ -145,10 +193,10 @@ const SignupScreen = ({ navigation }) => {
                             </TouchableOpacity>
                             <Text style={{ color: AppColors.PrimaryBlack, textAlign: 'center', top: 20 }}>Or SignUp in with</Text>
                             <View style={styles.googleContainer}>
-                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
+                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]} onPress={handleGoogle}>
                                     <Image source={ImagesPath.GoogleImages} style={styles.loginImages} />
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
+                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]} onPress={handleFacebook}>
                                     <Image source={ImagesPath.facebookImages} style={styles.loginImages} />
                                 </TouchableOpacity>
                             </View>

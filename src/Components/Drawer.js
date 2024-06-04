@@ -5,6 +5,7 @@ import { AppColors } from '../Constant/AppColor';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-simple-toast';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DrawerScreen = ({ onClose, drawerTranslate }) => {
     const navigation = useNavigation();
@@ -15,6 +16,7 @@ const DrawerScreen = ({ onClose, drawerTranslate }) => {
             .then(async () => {
                 Toast.show("Logout successful!", Toast.LONG);
                 navigation.replace('login')
+                await AsyncStorage.setItem("isLoggedIn", "false");
             }).catch((error) => {
                 console.log("Error logging out:", error);
             });
