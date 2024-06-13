@@ -1,25 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
 import { ImagesPath } from '../../Constant/ImagePath';
 import CustomAlert from '../../Components/CustomAlert';
+import firestore from '@react-native-firebase/firestore';
 
 const Users = ({ navigation }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [IsShow, setIsShow] = useState(false);
     const [IsUsers, setUsers] = useState({});
+    const [allUsers, setAllUsers] = useState([]);
 
-    const users = [
-        { id: '1', name: 'John Doe', email: 'john.doe@example.com' },
-        { id: '2', name: 'Jane Smith', email: 'jane.smith@example.com' },
-        { id: '3', name: 'Alice Johnson', email: 'alice.johnson@example.com' },
-    ];
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const usersCollection = await firestore().collection('users').get();
+                const usersList = usersCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("usersList====>>>>>>> ", usersList);
+                setAllUsers(usersList);
+            } catch (error) {
+                console.error('Error fetching users: ', error);
+            }
+        };
+
+        fetchUsers();
+    }, []);
 
     const handleSearch = (text) => {
         setSearchTerm(text);
         if (text.length >= 4) {
-            const filtered = users.filter(user => user.email.toLowerCase().includes(text.toLowerCase()));
+            const filtered = allUsers.filter(user => user.email.toLowerCase().includes(text.toLowerCase()));
             setFilteredUsers(filtered);
         } else {
             setFilteredUsers([]);

@@ -42,7 +42,7 @@ const LoginScreen = ({ navigation }) => {
         if (validateInputs()) {
             setLoading(true);
             try {
-                if (username === "Admin123@gmail.com" && password === "Admin123") {
+                if (username === "admin123@gmail.com") {
                     navigation.replace('BottomTab');
                 } else {
                     await auth().signInWithEmailAndPassword(username, password);

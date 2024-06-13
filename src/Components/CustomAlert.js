@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Image, Switch } from 'react-native';
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
+import Chat from './Chat';
 
-const CustomAlert = ({ visible, onClose, data, datas }) => {
+const CustomAlert = ({ visible, onClose, data, datas, parentChat }) => {
     const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
     const [pushNotificationEnabled1, setPushNotificationEnabled1] = useState(false);
     const [pushNotificationEnabled2, setPushNotificationEnabled2] = useState(false);
     const [pushNotificationEnabled3, setPushNotificationEnabled3] = useState(false);
     const [pushNotificationEnabled4, setPushNotificationEnabled4] = useState(false);
     const [pushNotificationEnabled5, setPushNotificationEnabled5] = useState(false);
+    const [isChat, setIsChat] = useState(false);
 
     useEffect(() => {
         console.log("data======>>>>> ", data);
@@ -17,6 +19,12 @@ const CustomAlert = ({ visible, onClose, data, datas }) => {
             setPushNotificationEnabled(data.isSubscribed);
         }
     }, [data]);
+
+    useEffect(() => {
+        if (isChat) {
+            parentChat();
+        }
+    }, [isChat]);
 
     const handleToggleSwitch = () => {
         setPushNotificationEnabled(previousState => !previousState);
@@ -43,6 +51,9 @@ const CustomAlert = ({ visible, onClose, data, datas }) => {
     };
 
 
+    const handleChat = () => {
+        setIsChat(true)
+    }
 
     const renderContent = () => {
         switch (datas) {
@@ -125,7 +136,7 @@ const CustomAlert = ({ visible, onClose, data, datas }) => {
                                     <TouchableOpacity style={styles.contactOptionButton}>
                                         <Text style={styles.contactOptionText}>TELEGRAM</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.contactOptionButton}>
+                                    <TouchableOpacity style={styles.contactOptionButton} onPress={handleChat}>
                                         <Text style={styles.contactOptionText}>LIVE CHAT</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -139,11 +150,17 @@ const CustomAlert = ({ visible, onClose, data, datas }) => {
     }
 
     return (
-        <Modal transparent animationType="slide" visible={visible}>
-            <View style={styles.modalContainer}>
-                {renderContent()}
-            </View>
-        </Modal>
+        <>
+            {isChat ? (
+                <Chat/>
+            ) : (
+                <Modal transparent animationType="slide" visible={visible}>
+                    <View style={styles.modalContainer}>
+                        {renderContent()}
+                    </View>
+                </Modal>
+            )}
+        </>
     );
 };
 

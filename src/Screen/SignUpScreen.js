@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
+import firestore from '@react-native-firebase/firestore';
 
 const SignupScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const SignupScreen = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false)
+    const [name, setName] = useState('')
 
     useEffect(() => {
         GoogleSignin.configure({
@@ -35,8 +37,15 @@ const SignupScreen = ({ navigation }) => {
         if (validateInputs()) {
             setLoading(true);
             try {
-                await auth().createUserWithEmailAndPassword(username, password);
+                const userCredential = await auth().createUserWithEmailAndPassword(username, password);
                 console.log('User account created & signed in!');
+
+                const user = userCredential.user;
+                await firestore().collection('users').doc(user.uid).set({
+                    name: name,
+                    email: username
+                });
+                
                 navigation.replace('home');
                 showToast('signUp successful');
                 await AsyncStorage.setItem("isLoggedIn", "true");
@@ -140,6 +149,16 @@ const SignupScreen = ({ navigation }) => {
                             </View>
                         </View>
                         <View style={styles.inputContainer}>
+                            <View style={styles.inputWrapper}>
+                                <Text style={styles.label}>Full Name</Text>
+                                <TextInput
+                                    style={[styles.input, { color: AppColors.PrimaryBlack }]}
+                                    placeholder="Enter your Name"
+                                    placeholderTextColor={AppColors.PrimaryBlack}
+                                    value={name}
+                                    onChangeText={(text) => setName(text.trim())}
+                                />
+                            </View>
                             <View style={styles.inputWrapper}>
                                 <Text style={styles.label}>Email</Text>
                                 <TextInput

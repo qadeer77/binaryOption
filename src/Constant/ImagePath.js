@@ -27,4 +27,5 @@ export const ImagesPath = {
     upload: require(`../Assests/Images/upload.png`),
     crossAlertIcon: require(`../Assests/Images/crossAlertIcon.png`),
     contactUs: require(`../Assests/Images/contact-Us.png`),
+    backImge: require(`../Assests/Images/backImge.png`),
 }

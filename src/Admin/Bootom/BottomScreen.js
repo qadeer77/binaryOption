@@ -11,6 +11,8 @@ import Users from '../BottomScreen/Users';
 
 const Tab = createBottomTabNavigator();
 const BottomTab = () => {
+    const [refreshBinaryPanel, setRefreshBinaryPanel] = useState(false);
+    const [refreshFxSignals, setRefreshFxSignals] = useState(false);
 
     return (
         <Tab.Navigator
@@ -22,9 +24,10 @@ const BottomTab = () => {
         >
             <Tab.Screen
                 name="BinaryPanel"
-                component={BinaryPanel}
+                component={() => <BinaryPanel refresh={refreshBinaryPanel} />}
                 listeners={{
                     tabPress: e => {
+                        setRefreshBinaryPanel(prevState => !prevState);
                     }
                 }}
                 options={{
@@ -41,9 +44,10 @@ const BottomTab = () => {
             />
             <Tab.Screen
                 name="FxPanel"
-                component={FxSignals}
+                component={() => <FxSignals refresh={refreshFxSignals} />}
                 listeners={{
                     tabPress: e => {
+                        setRefreshFxSignals(prevState => !prevState);
                     }
                 }}
                 options={{

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
 import { ImagesPath } from '../../Constant/ImagePath';
 import CheckBox from '@react-native-community/checkbox';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import Alluser from '../AdminChat/Alluser';
 
-const BinaryPanel = ({ navigation }) => {
+const BinaryPanel = ({ navigation, refresh }) => {
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [signals, setSignals] = useState('');
@@ -15,6 +16,10 @@ const BinaryPanel = ({ navigation }) => {
     const [checked4, setChecked4] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [visibleChat, setVisibleChat] = useState(false);
+
+    useEffect(() => {
+    }, [refresh]);
 
 
     const UploadImage = () => {
@@ -43,112 +48,118 @@ const BinaryPanel = ({ navigation }) => {
 
 
     const handleChat = () => {
-        
+        setVisibleChat(true)
     }
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.headerText}>Binary Panel</Text>
-                    <TouchableOpacity style={styles.menuIcon} onPress={handleThreeDot}>
-                        <Image source={ImagesPath.threeDot} style={{ width: 30, height: 30 }} />
-                    </TouchableOpacity>
-                    {showTooltip && (
-                        <View style={styles.tooltip}>
-                            <TouchableOpacity style={styles.tooltipOption} onPress={handleChat}>
-                                <Text style={styles.tooltipText}>Chat</Text>
+        <>
+            {visibleChat ? (
+                <Alluser />
+            ) : (
+                <ScrollView>
+                    <View style={styles.container}>
+                        <View style={styles.header}>
+                            <Text style={styles.headerText}>Binary Panel</Text>
+                            <TouchableOpacity style={styles.menuIcon} onPress={handleThreeDot}>
+                                <Image source={ImagesPath.threeDot} style={{ width: 30, height: 30 }} />
                             </TouchableOpacity>
-                            {/* <TouchableOpacity style={styles.tooltipOption}>
+                            {showTooltip && (
+                                <View style={styles.tooltip}>
+                                    <TouchableOpacity style={styles.tooltipOption} onPress={handleChat}>
+                                        <Text style={styles.tooltipText}>Chat</Text>
+                                    </TouchableOpacity>
+                                    {/* <TouchableOpacity style={styles.tooltipOption}>
                                 <Text style={styles.tooltipText}>Option 2</Text>
                             </TouchableOpacity> */}
-                        </View>
-                    )}
-                </View>
-                <View style={styles.content}>
-                    <Text style={styles.sendNotificationText}>Send Notification</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Notification Title"
-                        value={title}
-                        onChangeText={setTitle}
-                    />
-                    <TextInput
-                        style={[styles.input, styles.messageInput]}
-                        placeholder="Notification Message"
-                        value={message}
-                        onChangeText={setMessage}
-                        multiline={true}
-                        numberOfLines={4}
-                    />
-                </View>
-                <View style={styles.content}>
-                    <Text style={styles.sendNotificationText}>Send Signal</Text>
-                    <View style={styles.checkboxContainer}>
-                        <CheckBox
-                            value={checked1}
-                            onValueChange={setChecked1}
-                        />
-                        <Text style={styles.signalText}>Send to Vvipbinarysignals</Text>
-                    </View>
-                    <View style={styles.checkboxContainer}>
-                        <CheckBox
-                            value={checked2}
-                            onValueChange={setChecked2}
-                        />
-                        <Text style={styles.signalText}>Send to signals12</Text>
-                    </View>
-                    <View style={styles.checkboxContainer}>
-                        <CheckBox
-                            value={checked3}
-                            onValueChange={setChecked3}
-                        />
-                        <Text style={styles.signalText}>Premium Signal</Text>
-                    </View>
-                    <View style={styles.checkboxContainer}>
-                        <CheckBox
-                            value={checked4}
-                            onValueChange={setChecked4}
-                        />
-                        <Text style={styles.signalText}>Send Notification</Text>
-                    </View>
-                    <View style={styles.signalContainer}>
-                        <TextInput
-                            style={[styles.input, styles.messageInput]}
-                            placeholder="Signals"
-                            value={signals}
-                            onChangeText={setSignals}
-                            multiline={true}
-                            numberOfLines={4}
-                        />
-                    </View>
-                </View>
-                <View style={styles.content}>
-                    <Text style={styles.sendNotificationText}>Result</Text>
-                    <View style={styles.firestoreConatiner}>
-                        <Text style={styles.firestoreConatinerText}>Notification</Text>
-                        <Text style={styles.firestoreConatinerText}>Firestore</Text>
-                        <Text style={styles.firestoreConatinerText}>Vvipbinarysignals</Text>
-                        <Text style={styles.firestoreConatinerText}>Signals</Text>
-                    </View>
-                </View>
-                <View style={styles.content}>
-                    <Text style={styles.heading}>Upload Image</Text>
-                    <TouchableOpacity onPress={UploadImage}>
-                        <View style={styles.imageContainer}>
-                            {selectedImage ? (
-                                <Image source={{ uri: selectedImage }} style={styles.image} />
-                            ) : (
-                                <Image source={ImagesPath.upload} style={styles.image} />
+                                </View>
                             )}
                         </View>
-                    </TouchableOpacity>
-                </View>
-                <TouchableOpacity style={styles.sendButton}>
-                    <Text style={styles.sendButtonText}>send</Text>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
+                        <View style={styles.content}>
+                            <Text style={styles.sendNotificationText}>Send Notification</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Notification Title"
+                                value={title}
+                                onChangeText={setTitle}
+                            />
+                            <TextInput
+                                style={[styles.input, styles.messageInput]}
+                                placeholder="Notification Message"
+                                value={message}
+                                onChangeText={setMessage}
+                                multiline={true}
+                                numberOfLines={4}
+                            />
+                        </View>
+                        <View style={styles.content}>
+                            <Text style={styles.sendNotificationText}>Send Signal</Text>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    value={checked1}
+                                    onValueChange={setChecked1}
+                                />
+                                <Text style={styles.signalText}>Send to Vvipbinarysignals</Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    value={checked2}
+                                    onValueChange={setChecked2}
+                                />
+                                <Text style={styles.signalText}>Send to signals12</Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    value={checked3}
+                                    onValueChange={setChecked3}
+                                />
+                                <Text style={styles.signalText}>Premium Signal</Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                                <CheckBox
+                                    value={checked4}
+                                    onValueChange={setChecked4}
+                                />
+                                <Text style={styles.signalText}>Send Notification</Text>
+                            </View>
+                            <View style={styles.signalContainer}>
+                                <TextInput
+                                    style={[styles.input, styles.messageInput]}
+                                    placeholder="Signals"
+                                    value={signals}
+                                    onChangeText={setSignals}
+                                    multiline={true}
+                                    numberOfLines={4}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.content}>
+                            <Text style={styles.sendNotificationText}>Result</Text>
+                            <View style={styles.firestoreConatiner}>
+                                <Text style={styles.firestoreConatinerText}>Notification</Text>
+                                <Text style={styles.firestoreConatinerText}>Firestore</Text>
+                                <Text style={styles.firestoreConatinerText}>Vvipbinarysignals</Text>
+                                <Text style={styles.firestoreConatinerText}>Signals</Text>
+                            </View>
+                        </View>
+                        <View style={styles.content}>
+                            <Text style={styles.heading}>Upload Image</Text>
+                            <TouchableOpacity onPress={UploadImage}>
+                                <View style={styles.imageContainer}>
+                                    {selectedImage ? (
+                                        <Image source={{ uri: selectedImage }} style={styles.image} />
+                                    ) : (
+                                        <Image source={ImagesPath.upload} style={styles.image} />
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity style={styles.sendButton}>
+                            <Text style={styles.sendButtonText}>send</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            )}
+        </>
     );
 };
 

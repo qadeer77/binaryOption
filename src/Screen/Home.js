@@ -5,13 +5,20 @@ import { ImagesPath } from '../Constant/ImagePath';
 import DrawerScreen from '../Components/Drawer';
 import HomeChild from '../Components/HomeChild';
 import CustomAlert from '../Components/CustomAlert';
+import Chat from '../Components/Chat';
 
 const Home = ({ navigation }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isShow, setIsShow] = useState(false);
     const [isAlert, setIsAlert] = useState(false);
+    const [isChatActive, setIsChatActive] = useState(false); 
     const [selectedItem, setSelectedItem] = useState(null);
     const drawerAnimatedValue = useRef(new Animated.Value(0)).current;
+
+
+    const handleChat = () => {
+        setIsChatActive(true)
+    }
 
 
     const handleHemberger = () => {
@@ -63,6 +70,8 @@ const Home = ({ navigation }) => {
                 <DrawerScreen onClose={handleHemberger} drawerTranslate={drawerTranslateX} />
             ) : isShow ? (
                 <HomeChild onClose={handleBox} data={selectedItem} />
+            ) : isChatActive ? (
+                <Chat/>
             ) : (
                 <>
                     <ScrollView>
@@ -84,7 +93,7 @@ const Home = ({ navigation }) => {
                             ))}
                         </View>
                     </ScrollView>
-                    {isAlert && <CustomAlert datas={'contactUs'} onClose={handleClose}/>}
+                    {isAlert && <CustomAlert datas={'contactUs'} onClose={handleClose} parentChat={handleChat}/>}
                 </>
             )}
         </>

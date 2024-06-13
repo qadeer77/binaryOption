@@ -5,5 +5,12 @@ export const AppColors = {
     blue: '#164277',
     black: '#5C5C5C',
     ButtonColor: '#1E1572',
-    bottomTabColor: '#727F90'
+    bottomTabColor: '#727F90',
+    background: '#ffffff',
+    header: '#075E54',
+    text: '#000000',
+    userMessage: '#DCF8C6',
+    otherMessage: '#ECE5DD',
+    border: '#CCCCCC',
+    sendButton: '#25D366'
 }

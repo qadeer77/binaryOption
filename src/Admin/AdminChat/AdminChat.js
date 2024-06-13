@@ -1,31 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Keyboard, ScrollView } from 'react-native';
-import { ImagesPath } from '../Constant/ImagePath';
-import { AppColors } from '../Constant/AppColor';
-import { useNavigation } from '@react-navigation/native';
+import { AppColors } from '../../Constant/AppColor';
+import { ImagesPath } from '../../Constant/ImagePath';
 import database from '@react-native-firebase/database';
-import auth from '@react-native-firebase/auth';
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
-import {PermissionsAndroid} from 'react-native';
-PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-import messaging from '@react-native-firebase/messaging';
 
 function sanitizeEmail(email) {
     return email.replace(/[.#$[\]]/g, '_');
 }
 
-const Chat = ({ onClose }) => {
-    const navigation = useNavigation();
+
+const AdminChat = ({ onClose, data }) => {
     const [message, setMessage] = useState('');
-    const [user, setUser] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-    useEffect(() => {
-        const currentUser = auth().currentUser;
-        let sanitizedEmail = sanitizeEmail(currentUser.email);
-        setUser(sanitizedEmail);
 
+    let sanitizedEmail = sanitizeEmail(data.email);
+    useEffect(() => {
         const messagesRef = database().ref('/chats/' + sanitizedEmail + '/messages');
         messagesRef.on('value', snapshot => {
             const messages = snapshot.val();
@@ -35,24 +27,8 @@ const Chat = ({ onClose }) => {
             }
         });
 
-
-        messaging().getToken().then(token => {
-            console.log('FCM Token:', token);
-        });
-
-        const unsubscribe = messaging().onMessage(async remoteMessage => {
-            console.log('Received a message in the foreground:', remoteMessage);
-        });
-
-        return () => {
-            messagesRef.off('value');
-            unsubscribe();
-        };
-    }, [])
-
-    const handleBack = () => {
-        navigation.replace('home');
-    }
+        return () => messagesRef.off('value');
+    }, [sanitizedEmail]);
 
     const handleSend = () => {
         setShowEmojiPicker(false)
@@ -61,14 +37,14 @@ const Chat = ({ onClose }) => {
         const newMessage = {
             text: message.trim(),
             timestamp: Date.now(),
-            user: user,
-            isAdmin: false
+            user: data.email,
+            isAdmin: true
         };
 
-        database().ref('/chats/' + user + '/messages').push(newMessage);
+        database().ref('/chats/' + sanitizedEmail + '/messages').push(newMessage);
 
         setMessage('');
-    }
+    };
 
     const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp);
@@ -79,7 +55,7 @@ const Chat = ({ onClose }) => {
         hours = hours ? hours : 12;
         const minutesStr = minutes < 10 ? '0' + minutes : minutes;
         return `${hours}:${minutesStr} ${ampm}`;
-    }
+    };
 
     const handleEmojiSelect = (emoji) => {
         setMessage(message + emoji);
@@ -88,10 +64,10 @@ const Chat = ({ onClose }) => {
     return (
         <>
             <View style={styles.header}>
-                <TouchableOpacity onPress={handleBack}>
+                <TouchableOpacity onPress={onClose}>
                     <Image source={ImagesPath.BackIcon} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Chat</Text>
+                <Text style={styles.headerTitle}>{data.name}</Text>
                 <Text></Text>
             </View>
 
@@ -104,8 +80,8 @@ const Chat = ({ onClose }) => {
                             msg.isAdmin ? styles.adminMessageContainer : styles.userMessageContainer
                         ]}
                     >
-                        <Text style={msg.isAdmin ? styles.messageText1 : styles.messageText}>{msg.text}</Text>
-                        <Text style={msg.isAdmin ? styles.timestamp1 : styles.timestamp}>{formatTimestamp(msg.timestamp)}</Text>
+                        <Text style={msg.isAdmin ? styles.messageText : styles.messageText1}>{msg.text}</Text>
+                        <Text style={msg.isAdmin ? styles.timestamp : styles.timestamp1}>{formatTimestamp(msg.timestamp)}</Text>
                     </View>
                 ))}
             </ScrollView>
@@ -123,9 +99,8 @@ const Chat = ({ onClose }) => {
                 <TouchableOpacity style={styles.emojiButton} onPress={() => setShowEmojiPicker(!showEmojiPicker)}>
                     <Text style={styles.emojiText}>😄</Text>
                 </TouchableOpacity>
-
                 <TextInput
-                    style={[styles.input, { flex: 1, marginLeft: 10 }]}
+                     style={[styles.input, { flex: 1, marginLeft: 10 }]}
                     value={message}
                     onChangeText={setMessage}
                     placeholder="Type your message"
@@ -165,12 +140,12 @@ const styles = StyleSheet.create({
         minWidth: '20%'
     },
     adminMessageContainer: {
-        backgroundColor: AppColors.userMessage,
-        alignSelf: 'flex-start',
-    },
-    userMessageContainer: {
         backgroundColor: AppColors.sendButton,
         alignSelf: 'flex-end',
+    },
+    userMessageContainer: {
+        backgroundColor: AppColors.userMessage,
+        alignSelf: 'flex-start',
     },
     messageText: {
         color: AppColors.PrimaryWhite,
@@ -245,4 +220,6 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Chat;
+export default AdminChat;
+
+
