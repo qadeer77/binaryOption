@@ -6,9 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
-import {PermissionsAndroid} from 'react-native';
-PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+import { PermissionsAndroid } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
+import firestore from '@react-native-firebase/firestore';
 
 function sanitizeEmail(email) {
     return email.replace(/[.#$[\]]/g, '_');
@@ -20,6 +20,7 @@ const Chat = ({ onClose }) => {
     const [user, setUser] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [userFCMToken, setUserFCMToken] = useState(null);
 
     useEffect(() => {
         const currentUser = auth().currentUser;
@@ -35,26 +36,16 @@ const Chat = ({ onClose }) => {
             }
         });
 
-
-        messaging().getToken().then(token => {
-            console.log('FCM Token:', token);
-        });
-
-        const unsubscribe = messaging().onMessage(async remoteMessage => {
-            console.log('Received a message in the foreground:', remoteMessage);
-        });
-
         return () => {
             messagesRef.off('value');
-            unsubscribe();
         };
-    }, [])
+    }, []);
 
     const handleBack = () => {
         navigation.replace('home');
     }
 
-    const handleSend = () => {
+    const handleSend = async () => {
         setShowEmojiPicker(false)
         if (message.trim() === '') return;
 
@@ -62,7 +53,7 @@ const Chat = ({ onClose }) => {
             text: message.trim(),
             timestamp: Date.now(),
             user: user,
-            isAdmin: false
+            isAdmin: true
         };
 
         database().ref('/chats/' + user + '/messages').push(newMessage);
@@ -95,7 +86,7 @@ const Chat = ({ onClose }) => {
                 <Text></Text>
             </View>
 
-            <ScrollView style={styles.chatContainer}>
+            <ScrollView style={styles.chatContainer} keyboardShouldPersistTaps="handled">
                 {chatMessages.map((msg, index) => (
                     <View
                         key={index}
@@ -110,22 +101,25 @@ const Chat = ({ onClose }) => {
                 ))}
             </ScrollView>
 
-            <View style={styles.footer}>
-                {showEmojiPicker && (
-                    <View style={styles.emojiPicker}>
+            {showEmojiPicker && (
+                <View style={styles.emojiPicker}>
+                    <ScrollView keyboardShouldPersistTaps="always">
                         <EmojiSelector
                             category={Categories.symbols}
                             onEmojiSelected={handleEmojiSelect}
                             showSearchBar={false}
                         />
-                    </View>
-                )}
+                    </ScrollView>
+                </View>
+            )}
+
+            <View style={styles.footer}>
                 <TouchableOpacity style={styles.emojiButton} onPress={() => setShowEmojiPicker(!showEmojiPicker)}>
                     <Text style={styles.emojiText}>😄</Text>
                 </TouchableOpacity>
 
                 <TextInput
-                    style={[styles.input, { flex: 1, marginLeft: 10 }]}
+                    style={[styles.input, { flex: 1, marginLeft: 10, zIndex: 100000 }]}
                     value={message}
                     onChangeText={setMessage}
                     placeholder="Type your message"
@@ -225,12 +219,16 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     emojiPicker: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        height: '30%',
         backgroundColor: '#f2f2f2',
     },
+    // emojiPicker: {
+    //     position: 'relative',
+    //     bottom: 0,
+    //     left: 0,
+    //     right: 0,
+    //     backgroundColor: '#f2f2f2',
+    // },
     emojiButton: {
         justifyContent: 'center',
         alignItems: 'center',

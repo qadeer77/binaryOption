@@ -86,21 +86,25 @@ const AdminChat = ({ onClose, data }) => {
                 ))}
             </ScrollView>
 
-            <View style={styles.footer}>
-                {showEmojiPicker && (
-                    <View style={styles.emojiPicker}>
+
+            {showEmojiPicker && (
+                <View style={styles.emojiPicker}>
+                    <ScrollView keyboardShouldPersistTaps="always">
                         <EmojiSelector
                             category={Categories.symbols}
                             onEmojiSelected={handleEmojiSelect}
                             showSearchBar={false}
                         />
-                    </View>
-                )}
+                    </ScrollView>
+                </View>
+            )}
+
+            <View style={styles.footer}>
                 <TouchableOpacity style={styles.emojiButton} onPress={() => setShowEmojiPicker(!showEmojiPicker)}>
                     <Text style={styles.emojiText}>😄</Text>
                 </TouchableOpacity>
                 <TextInput
-                     style={[styles.input, { flex: 1, marginLeft: 10 }]}
+                    style={[styles.input, { flex: 1, marginLeft: 10 }]}
                     value={message}
                     onChangeText={setMessage}
                     placeholder="Type your message"
@@ -200,12 +204,16 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     emojiPicker: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        height: '30%',
         backgroundColor: '#f2f2f2',
     },
+    // emojiPicker: {
+    //     position: 'absolute',
+    //     bottom: 0,
+    //     left: 0,
+    //     right: 0,
+    //     backgroundColor: '#f2f2f2',
+    // },
     emojiButton: {
         justifyContent: 'center',
         alignItems: 'center',
