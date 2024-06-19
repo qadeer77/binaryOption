@@ -5,6 +5,7 @@ import { AppColors } from '../Constant/AppColor';
 import Toast from 'react-native-simple-toast';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import firestore from '@react-native-firebase/firestore';
 
 const LoginScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +13,7 @@ const LoginScreen = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
+    const [admins, setAdmins] = useState([]);
 
     const handleRegister = () => {
         navigation.replace('signUpScreen');
@@ -19,6 +21,21 @@ const LoginScreen = ({ navigation }) => {
 
 
     useEffect(() => {
+
+        const fetchAdmins = async () => {
+            try {
+                const adminCollection = await firestore().collection('admins').get();
+                const adminList = adminCollection.docs.map(doc => doc.data());
+                const emails = adminList.flatMap(admin => admin.emails);
+                const selectedEmails = [emails[0], emails[2]];
+                setAdmins(selectedEmails);
+            } catch (error) {
+                console.error("Error fetching admins: ", error);
+            }
+        };
+
+        fetchAdmins();
+
         const keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
             () => {
@@ -42,7 +59,8 @@ const LoginScreen = ({ navigation }) => {
         if (validateInputs()) {
             setLoading(true);
             try {
-                if (username === "admin123@gmail.com") {
+                const isAdmin = admins.includes(username);
+                if (isAdmin) {
                     navigation.replace('BottomTab');
                 } else {
                     await auth().signInWithEmailAndPassword(username, password);
@@ -55,6 +73,12 @@ const LoginScreen = ({ navigation }) => {
                     console.log('The email address you entered does not exist in our records.');
                     showToast('The email address you entered does not exist in our records.');
                 } else if (error.code === 'auth/invalid-email') {
+                    console.log('That email address is invalid!');
+                } else if (error.code === 'auth/user-not-found') {
+                    showToast('The email address you entered does not exist in our records.');
+                    console.log('That email address is invalid!');
+                } else if (error.code === 'auth/wrong-password') {
+                    showToast('Your Password Is Wrong.');
                     console.log('That email address is invalid!');
                 } else {
                     console.error(error);

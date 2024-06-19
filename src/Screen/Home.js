@@ -40,13 +40,13 @@ const Home = ({ navigation }) => {
 
 
     const data = [
-        { id: 1, image: ImagesPath.binarySignalImages, text: 'Binary Signals' },
-        { id: 2, image: ImagesPath.binarySignalImages, text: 'Forex Signals' },
-        { id: 3, image: ImagesPath.PdfImages, text: 'Book' },
-        { id: 4, image: ImagesPath.VideoCourse, text: 'Video Course' },
-        { id: 5, image: ImagesPath.liveCourse, text: 'Live Course' },
-        { id: 6, image: ImagesPath.FollowUs, text: 'Follow Us' },
-        { id: 7, image: ImagesPath.contactUs, text: 'Contact Us' },
+        { id: 1, image: ImagesPath.binarySignalImages, text: 'Quotex Signals' },
+        { id: 2, image: ImagesPath.binarySignalImages, text: 'Quotex Trading Bot' },
+        { id: 3, image: ImagesPath.PdfImages, text: 'Quotex Trading Course' },
+        { id: 4, image: ImagesPath.VideoCourse, text: 'Forex Signals' },
+        { id: 5, image: ImagesPath.liveCourse, text: 'Forex Course' },
+        // { id: 6, image: ImagesPath.FollowUs, text: 'Follow Us' },
+        { id: 6, image: ImagesPath.contactUs, text: 'Contact Us' },
     ];
 
 
@@ -119,12 +119,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f0f0f0',
         paddingHorizontal: 5,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        alignItems: 'center'
+        // flexDirection: 'row',
+        // flexWrap: 'wrap',
+        // justifyContent: 'space-between',
     },
     box: {
-        width: '48%',
+        width: '90%',
         marginVertical: 10,
         padding: 20,
         backgroundColor: 'white',
@@ -134,7 +135,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 2,
         elevation: 5,
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'center'
     },
     image: {
         width: 100,

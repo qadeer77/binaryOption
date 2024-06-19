@@ -28,4 +28,6 @@ export const ImagesPath = {
     crossAlertIcon: require(`../Assests/Images/crossAlertIcon.png`),
     contactUs: require(`../Assests/Images/contact-Us.png`),
     backImge: require(`../Assests/Images/backImge.png`),
+    eyeImage: require(`../Assests/Images/eyeImage.png`),
+    eyeSlashImage: require(`../Assests/Images/eyeSlashImage.png`),
 }

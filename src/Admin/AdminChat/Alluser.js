@@ -15,10 +15,10 @@ const Alluser = ({ navigation }) => {
         const fetchUsers = async () => {
             try {
                 const usersCollection = await firestore().collection('users').get();
-                // const usersList = usersCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const usersList = usersCollection.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(user => user.name === 'tahaahmed123');
+                const usersList = usersCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // const usersList = usersCollection.docs
+                //     .map(doc => ({ id: doc.id, ...doc.data() }))
+                //     .filter(user => user.name === 'tahaahmed123');
                 setAllUsers(usersList);
                 setAllUsers(usersList);
             } catch (error) {

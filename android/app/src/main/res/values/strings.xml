@@ -1,6 +1,6 @@
 <resources>
     <!-- <string name="app_name">Binary Option And Forex Signals</string> -->
-    <string name="app_name">Binary</string>
+    <string name="app_name">Quotex Trading Signals</string>
     <string name="facebook_app_id">784704507138392</string>
     <string name="fb_login_protocol_scheme">fb1234</string>
     <string name="facebook_client_token">58085c996cfeb056d5a1972e7a5dc284</string>
