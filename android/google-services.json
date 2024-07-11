@@ -1,90 +1,51 @@
 {
   "project_info": {
-    "project_number": "746230465058",
-    "firebase_url": "https://binaryoptioncourse.firebaseio.com",
-    "project_id": "binaryoptioncourse",
-    "storage_bucket": "binaryoptioncourse.appspot.com"
+    "project_number": "633515924228",
+    "firebase_url": "https://forex-specialist-default-rtdb.firebaseio.com",
+    "project_id": "forex-specialist",
+    "storage_bucket": "forex-specialist.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:746230465058:android:c78e78cbf514fbae25807b",
+        "mobilesdk_app_id": "1:633515924228:android:92cdbcec15a7042a390e51",
         "android_client_info": {
-          "package_name": "com.lordsofbinary.binaryoptioncourse"
+          "package_name": "com.example.forexadminpanel"
         }
       },
       "oauth_client": [
         {
-          "client_id": "746230465058-7dv30s5ih01fjcb64bq6us2a1a0af6cb.apps.googleusercontent.com",
+          "client_id": "633515924228-9m3lto9nk9llruurvhbuqmj57hq14jug.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.lordsofbinary.binaryoptioncourse",
-            "certificate_hash": "cf0d38870835997d6e800f6be48a39b8f03d98f4"
+            "package_name": "com.example.forexadminpanel",
+            "certificate_hash": "ed39a21e2c6b7c7ec97dbf3632a2896640e8590b"
           }
         },
         {
-          "client_id": "746230465058-8gs9u9pqrubipa1l6bqjd8lhc3edsc1o.apps.googleusercontent.com",
+          "client_id": "633515924228-kgelg1i4t1jrobgag1l78tu8pmlj6fd6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.lordsofbinary.binaryoptioncourse",
-            "certificate_hash": "fb5587b751ab40011cb1ec0622cf8cf86524f3d0"
+            "package_name": "com.example.forexadminpanel",
+            "certificate_hash": "ad5f8771f44dfa99963f9c4b9151cadfcb347b1a"
           }
         },
         {
-          "client_id": "746230465058-q79varb61h2n67dn266epp0k9c5k9kb4.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.binaryoptioncourse",
-            "certificate_hash": "9aea59d3c059bb9b61105db71f7f72323e1cb59f"
-          }
-        },
-        {
-          "client_id": "746230465058-qeb0m3f4cusq5801llbvclq4rn6gk6dd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.binaryoptioncourse",
-            "certificate_hash": "1a07a11313558ff9d3f2773f86696e7f85d5e326"
-          }
-        },
-        {
-          "client_id": "746230465058-t192kfcjc26feqlavd18djd7ov48srq2.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.binaryoptioncourse",
-            "certificate_hash": "a140ae0c1271f02c8179c2006789d5f3b6b92a31"
-          }
-        },
-        {
-          "client_id": "746230465058-uo4unhkajchjiv4blis6smialsvti8m8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.binaryoptioncourse",
-            "certificate_hash": "dcba0e3a149865b360241c2e93a321628f4f8fb6"
-          }
-        },
-        {
-          "client_id": "746230465058-ohfsjasi910rjdpoc6r14r9ajtu90pu3.apps.googleusercontent.com",
+          "client_id": "633515924228-j3vruppuscvnhc6pvjrem49hkkunanr1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCqyjQuNnHenQMbgMyZXtmnqH1xoRhNR_Q"
+          "current_key": "AIzaSyCCYDqZiaa6TtWlG8CSR47kdg4-ao0B0Zc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "746230465058-ohfsjasi910rjdpoc6r14r9ajtu90pu3.apps.googleusercontent.com",
+              "client_id": "633515924228-gd7baadcs31n6m26f68ncn0673vp27sf.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "746230465058-0dpgn4et6n8aktef969gfumkgssk68tv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.lordsofbinary.fxsignals"
-              }
             }
           ]
         }
@@ -92,67 +53,28 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:746230465058:android:1faad9a13e3c353725807b",
+        "mobilesdk_app_id": "1:633515924228:android:de29b109bc176a8a390e51",
         "android_client_info": {
-          "package_name": "com.lordsofbinary.signalspanel"
+          "package_name": "com.meet.strange.mystermeet"
         }
       },
       "oauth_client": [
         {
-          "client_id": "746230465058-a1t30bvpso3ug2pgt6aja7uonjvs384q.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.signalspanel",
-            "certificate_hash": "cf0d38870835997d6e800f6be48a39b8f03d98f4"
-          }
-        },
-        {
-          "client_id": "746230465058-luprh76gli48257u6ckhk4rqe1rqlivt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.signalspanel",
-            "certificate_hash": "9aea59d3c059bb9b61105db71f7f72323e1cb59f"
-          }
-        },
-        {
-          "client_id": "746230465058-mro4ajnssf692j5ks9b3g9minin4jj09.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.signalspanel",
-            "certificate_hash": "1a07a11313558ff9d3f2773f86696e7f85d5e326"
-          }
-        },
-        {
-          "client_id": "746230465058-p1tatj23e4c4u53n5q7vrv1duileg3cd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lordsofbinary.signalspanel",
-            "certificate_hash": "a140ae0c1271f02c8179c2006789d5f3b6b92a31"
-          }
-        },
-        {
-          "client_id": "746230465058-ohfsjasi910rjdpoc6r14r9ajtu90pu3.apps.googleusercontent.com",
+          "client_id": "633515924228-j3vruppuscvnhc6pvjrem49hkkunanr1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCqyjQuNnHenQMbgMyZXtmnqH1xoRhNR_Q"
+          "current_key": "AIzaSyCCYDqZiaa6TtWlG8CSR47kdg4-ao0B0Zc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "746230465058-ohfsjasi910rjdpoc6r14r9ajtu90pu3.apps.googleusercontent.com",
+              "client_id": "633515924228-gd7baadcs31n6m26f68ncn0673vp27sf.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "746230465058-0dpgn4et6n8aktef969gfumkgssk68tv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.lordsofbinary.fxsignals"
-              }
             }
           ]
         }

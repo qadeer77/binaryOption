@@ -6,9 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
-import { PermissionsAndroid } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
-import firestore from '@react-native-firebase/firestore';
 
 function sanitizeEmail(email) {
     return email.replace(/[.#$[\]]/g, '_');
@@ -20,14 +17,13 @@ const Chat = ({ onClose }) => {
     const [user, setUser] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [userFCMToken, setUserFCMToken] = useState(null);
 
     useEffect(() => {
         const currentUser = auth().currentUser;
         let sanitizedEmail = sanitizeEmail(currentUser.email);
         setUser(sanitizedEmail);
 
-        const messagesRef = database().ref('/chats/' + sanitizedEmail + '/messages');
+        const messagesRef = database().ref('/chates/' + sanitizedEmail + '/messages');
         messagesRef.on('value', snapshot => {
             const messages = snapshot.val();
             if (messages) {
@@ -46,17 +42,17 @@ const Chat = ({ onClose }) => {
     }
 
     const handleSend = async () => {
-        setShowEmojiPicker(false)
+        setShowEmojiPicker(false);
         if (message.trim() === '') return;
 
         const newMessage = {
             text: message.trim(),
             timestamp: Date.now(),
             user: user,
-            isAdmin: true
+            isAdmin: false // User messages should not be marked as isAdmin
         };
 
-        database().ref('/chats/' + user + '/messages').push(newMessage);
+        database().ref('/chates/' + user + '/messages').push(newMessage);
 
         setMessage('');
     }
@@ -92,11 +88,12 @@ const Chat = ({ onClose }) => {
                         key={index}
                         style={[
                             styles.messageContainer,
-                            msg.isAdmin ? styles.adminMessageContainer : styles.userMessageContainer
+                            msg.isAdmin ? styles.adminMessageContainer : styles.userMessageContainer,
+                            { alignSelf: msg.isAdmin ? 'flex-start' : 'flex-end' }
                         ]}
                     >
-                        <Text style={msg.isAdmin ? styles.messageText1 : styles.messageText}>{msg.text}</Text>
-                        <Text style={msg.isAdmin ? styles.timestamp1 : styles.timestamp}>{formatTimestamp(msg.timestamp)}</Text>
+                        <Text style={msg.isAdmin ? styles.messageText : styles.messageText1}>{msg.text}</Text>
+                        <Text style={msg.isAdmin ? styles.timestamp : styles.timestamp1}>{formatTimestamp(msg.timestamp)}</Text>
                     </View>
                 ))}
             </ScrollView>
@@ -159,11 +156,11 @@ const styles = StyleSheet.create({
         minWidth: '20%'
     },
     adminMessageContainer: {
-        backgroundColor: AppColors.userMessage,
+        backgroundColor: AppColors.sendButton,
         alignSelf: 'flex-start',
     },
     userMessageContainer: {
-        backgroundColor: AppColors.sendButton,
+        backgroundColor: AppColors.userMessage,
         alignSelf: 'flex-end',
     },
     messageText: {
@@ -222,13 +219,6 @@ const styles = StyleSheet.create({
         height: '30%',
         backgroundColor: '#f2f2f2',
     },
-    // emojiPicker: {
-    //     position: 'relative',
-    //     bottom: 0,
-    //     left: 0,
-    //     right: 0,
-    //     backgroundColor: '#f2f2f2',
-    // },
     emojiButton: {
         justifyContent: 'center',
         alignItems: 'center',

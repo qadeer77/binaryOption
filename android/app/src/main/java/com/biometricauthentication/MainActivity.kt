@@ -1,4 +1,4 @@
-package com.lordsofbinary.binaryoptioncourse
+package com.example.forexadminpanel
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

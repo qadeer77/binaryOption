@@ -20,7 +20,7 @@ const SignupScreen = ({ navigation }) => {
 
     useEffect(() => {
         GoogleSignin.configure({
-            webClientId: '746230465058-ohfsjasi910rjdpoc6r14r9ajtu90pu3.apps.googleusercontent.com',
+            webClientId: '633515924228-j3vruppuscvnhc6pvjrem49hkkunanr1.apps.googleusercontent.com',
         });
     }, []);
 
@@ -92,6 +92,7 @@ const SignupScreen = ({ navigation }) => {
     };
 
     const handleGoogle = async () => {
+        console.log("hlelloooooooooooo");
         try {
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
             const { idToken } = await GoogleSignin.signIn();
@@ -215,9 +216,9 @@ const SignupScreen = ({ navigation }) => {
                                 <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]} onPress={handleGoogle}>
                                     <Image source={ImagesPath.GoogleImages} style={styles.loginImages} />
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]} onPress={handleFacebook}>
+                                {/* <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]} onPress={handleFacebook}>
                                     <Image source={ImagesPath.facebookImages} style={styles.loginImages} />
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                             </View>
                             <View style={styles.registerTextContainer}>
                                 <Text style={styles.registerText}>Already have an account?</Text>

@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, TextInput } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
 import firestore from '@react-native-firebase/firestore';
 import AdminChat from './AdminChat';
+import database from '@react-native-firebase/database';
 
 const Alluser = ({ navigation }) => {
     const [isShow, setIsShow] = useState(false);
     const [data, setData] = useState({});
     const [allUsers, setAllUsers] = useState([]);
     const [loading, setLoading] = useState(false)
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         setLoading(true)
         const fetchUsers = async () => {
             try {
-                const usersCollection = await firestore().collection('users').get();
-                const usersList = usersCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                // const usersList = usersCollection.docs
-                //     .map(doc => ({ id: doc.id, ...doc.data() }))
-                //     .filter(user => user.name === 'tahaahmed123');
-                setAllUsers(usersList);
-                setAllUsers(usersList);
+                const usersSnapshot = await database().ref('chates').once('value');
+                const emails = usersSnapshot.val() ? Object.keys(usersSnapshot.val()) : [];
+                console.log("emails====>>>>> ", emails);
+                setFilteredUsers(emails);
+                setAllUsers(emails)
             } catch (error) {
                 console.error('Error fetching users: ', error);
             } finally {
@@ -31,9 +32,20 @@ const Alluser = ({ navigation }) => {
         fetchUsers();
     }, []);
 
-    const handleItem = (item) => {
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredUsers(allUsers);
+        } else {
+            const filtered = allUsers.filter((email) =>
+                email.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredUsers(filtered);
+        }
+    }, [searchQuery, allUsers]);
+
+    const handleItem = (item, email) => {
         setIsShow(!isShow);
-        setData(item);
+        setData({ item, email });
     };
 
     const renderItem = ({ item }) => {
@@ -56,15 +68,30 @@ const Alluser = ({ navigation }) => {
             ) : (
                 <View style={styles.container}>
                     <Text style={styles.headerText}>All Users</Text>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search users..."
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
                     {loading ? (
                         <ActivityIndicator size="large" color={AppColors.PrimaryBlack} />
                     ) : (
                         <ScrollView>
-                            <FlatList
-                                data={allUsers}
-                                renderItem={renderItem}
-                                keyExtractor={item => item.id}
-                            />
+                            {filteredUsers.length > 0 ? (
+                                filteredUsers.map((item) => {
+                                    const email = item.split('@')[0]
+                                    return (
+                                        <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => handleItem(item, email)}>
+                                            <View style={styles.textContainer}>
+                                                <Text style={styles.name}>{email}</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    )
+                                })
+                            ) : (
+                                <></>
+                            )}
                         </ScrollView>
                     )}
                 </View>
@@ -85,6 +112,15 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         textAlign: 'center',
         marginTop: 10
+    },
+    searchInput: {
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginHorizontal: 16,
+        marginBottom: 16,
     },
     itemContainer: {
         flexDirection: 'row',

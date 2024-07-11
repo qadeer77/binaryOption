@@ -6,6 +6,7 @@ import Toast from 'react-native-simple-toast';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const LoginScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +19,13 @@ const LoginScreen = ({ navigation }) => {
     const handleRegister = () => {
         navigation.replace('signUpScreen');
     }
+
+
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: '633515924228-j3vruppuscvnhc6pvjrem49hkkunanr1.apps.googleusercontent.com',
+        });
+    }, []);
 
 
     useEffect(() => {
@@ -60,6 +68,7 @@ const LoginScreen = ({ navigation }) => {
             setLoading(true);
             try {
                 const isAdmin = admins.includes(username);
+                console.log("isAdmin=====>>>>>>> ", isAdmin);
                 if (isAdmin) {
                     navigation.replace('BottomTab');
                 } else {
@@ -81,7 +90,7 @@ const LoginScreen = ({ navigation }) => {
                     showToast('Your Password Is Wrong.');
                     console.log('That email address is invalid!');
                 } else {
-                    console.error(error);
+                    console.error("errror=====>>>>> ", error);
                 }
             } finally {
                 setLoading(false);
@@ -112,6 +121,20 @@ const LoginScreen = ({ navigation }) => {
             return true;
         }
     };
+
+    const handleGoogle = async() => {
+        try {
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            const { idToken } = await GoogleSignin.signIn();
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            await auth().signInWithCredential(googleCredential);
+            showToast('Google Sign-In successful');
+            navigation.replace('home');
+            await AsyncStorage.setItem("isLoggedIn", "true");
+        } catch (error) {
+            console.log("error=====>>>> ", error);
+        }
+    }
 
     return (
         <>
@@ -163,12 +186,12 @@ const LoginScreen = ({ navigation }) => {
                             </TouchableOpacity>
                             <Text style={{ color: AppColors.PrimaryBlack, textAlign: 'center', top: 20 }}>Or Login in with</Text>
                             <View style={styles.googleContainer}>
-                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
+                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]} onPress={handleGoogle}>
                                     <Image source={ImagesPath.GoogleImages} style={styles.loginImages} />
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
+                                {/* <TouchableOpacity style={[styles.fgaSubContainer, { marginRight: 15 }]}>
                                     <Image source={ImagesPath.facebookImages} style={styles.loginImages} />
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                             </View>
                             <View style={styles.registerTextContainer}>
                                 <Text style={styles.registerText}>Don't have an account?</Text>

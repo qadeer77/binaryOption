@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Keyboard, ScrollView } from 'react-native';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
 import { ImagesPath } from '../../Constant/ImagePath';
 import database from '@react-native-firebase/database';
@@ -9,16 +9,19 @@ function sanitizeEmail(email) {
     return email.replace(/[.#$[\]]/g, '_');
 }
 
-
 const AdminChat = ({ onClose, data }) => {
     const [message, setMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
 
-    let sanitizedEmail = sanitizeEmail(data.email);
     useEffect(() => {
-        const messagesRef = database().ref('/chats/' + sanitizedEmail + '/messages');
+        console.log("data===>>>>>> ", data);
+    }, [])
+
+    let sanitizedEmail = sanitizeEmail(data.item);
+    useEffect(() => {
+        const messagesRef = database().ref('/chates/' + sanitizedEmail + '/messages');
         messagesRef.on('value', snapshot => {
             const messages = snapshot.val();
             if (messages) {
@@ -31,17 +34,17 @@ const AdminChat = ({ onClose, data }) => {
     }, [sanitizedEmail]);
 
     const handleSend = () => {
-        setShowEmojiPicker(false)
+        setShowEmojiPicker(false);
         if (message.trim() === '') return;
 
         const newMessage = {
             text: message.trim(),
             timestamp: Date.now(),
             user: data.email,
-            isAdmin: true
+            isAdmin: true // Admin messages should be marked as isAdmin
         };
 
-        database().ref('/chats/' + sanitizedEmail + '/messages').push(newMessage);
+        database().ref('/chates/' + sanitizedEmail + '/messages').push(newMessage);
 
         setMessage('');
     };
@@ -59,7 +62,7 @@ const AdminChat = ({ onClose, data }) => {
 
     const handleEmojiSelect = (emoji) => {
         setMessage(message + emoji);
-    }
+    };
 
     return (
         <>
@@ -67,7 +70,7 @@ const AdminChat = ({ onClose, data }) => {
                 <TouchableOpacity onPress={onClose}>
                     <Image source={ImagesPath.BackIcon} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>{data.name}</Text>
+                <Text style={styles.headerTitle}>{data.email}</Text>
                 <Text></Text>
             </View>
 
@@ -85,7 +88,6 @@ const AdminChat = ({ onClose, data }) => {
                     </View>
                 ))}
             </ScrollView>
-
 
             {showEmojiPicker && (
                 <View style={styles.emojiPicker}>
@@ -207,13 +209,6 @@ const styles = StyleSheet.create({
         height: '30%',
         backgroundColor: '#f2f2f2',
     },
-    // emojiPicker: {
-    //     position: 'absolute',
-    //     bottom: 0,
-    //     left: 0,
-    //     right: 0,
-    //     backgroundColor: '#f2f2f2',
-    // },
     emojiButton: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -229,5 +224,3 @@ const styles = StyleSheet.create({
 });
 
 export default AdminChat;
-
-
