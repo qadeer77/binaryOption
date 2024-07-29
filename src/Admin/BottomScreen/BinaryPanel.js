@@ -5,6 +5,8 @@ import { ImagesPath } from '../../Constant/ImagePath';
 import CheckBox from '@react-native-community/checkbox';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Alluser from '../AdminChat/Alluser';
+import firestore from '@react-native-firebase/firestore'; 
+import Toast from 'react-native-simple-toast';
 
 const BinaryPanel = ({ navigation, refresh }) => {
     const [title, setTitle] = useState('');
@@ -50,6 +52,34 @@ const BinaryPanel = ({ navigation, refresh }) => {
     const handleChat = () => {
         setVisibleChat(true)
     }
+
+    const handleSend = async () => {
+        if (!signals) {
+            showToast('Signal message is empty');
+            return;
+        }
+
+        const currentDate = new Date();
+        const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+
+        const signalData = {
+            text: signals,
+            dateTime: formattedDate,
+            premium: checked3
+        };
+
+        try {
+            await firestore().collection('signals').add(signalData);
+            console.log('Signal data saved successfully');
+            setSignals(''); 
+        } catch (error) {
+            console.error('Error saving signal data: ', error);
+        }
+    };
+
+    const showToast = (text) => {
+        Toast.show(text, Toast.LONG);
+    };
 
     return (
         <>
@@ -153,7 +183,7 @@ const BinaryPanel = ({ navigation, refresh }) => {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.sendButton}>
+                        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
                             <Text style={styles.sendButtonText}>send</Text>
                         </TouchableOpacity>
                     </View>

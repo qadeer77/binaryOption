@@ -30,4 +30,5 @@ export const ImagesPath = {
     backImge: require(`../Assests/Images/backImge.png`),
     eyeImage: require(`../Assests/Images/eyeImage.png`),
     eyeSlashImage: require(`../Assests/Images/eyeSlashImage.png`),
+    eyeiconImge: require(`../Assests/Images/eyeiconImge.png`),
 }

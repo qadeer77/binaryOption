@@ -1,4 +1,5 @@
 package com.example.forexadminpanel
+import com.dooboolab.rniap.RNIapPackage;
 
 import android.app.Application
 import com.facebook.react.PackageList

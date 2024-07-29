@@ -6,10 +6,12 @@ import DrawerScreen from '../Components/Drawer';
 import HomeChild from '../Components/HomeChild';
 import CustomAlert from '../Components/CustomAlert';
 import Chat from '../Components/Chat';
+import QuotexSignalsChild from '../Components/QuotexSignalsChild';
 
 const Home = ({ navigation }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isShow, setIsShow] = useState(false);
+    const [isShowQuotexSignal, setIsShowQuotexSignal] = useState(false);
     const [isAlert, setIsAlert] = useState(false);
     const [isChatActive, setIsChatActive] = useState(false); 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -56,8 +58,11 @@ const Home = ({ navigation }) => {
 
 
     const handleBox = (item) => {
+        console.log("item====>>>>> ", item);
         if (item.text === 'Contact Us') {
             setIsAlert(true)
+        } else if (item.text === 'Quotex Signals') {
+            setIsShowQuotexSignal(true)
         } else {
             setSelectedItem(item);
             setIsShow(!isShow);
@@ -72,6 +77,8 @@ const Home = ({ navigation }) => {
                 <HomeChild onClose={handleBox} data={selectedItem} />
             ) : isChatActive ? (
                 <Chat/>
+            ) : isShowQuotexSignal ? (
+                <QuotexSignalsChild/>
             ) : (
                 <>
                     <ScrollView>
