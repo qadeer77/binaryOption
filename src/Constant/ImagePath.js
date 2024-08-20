@@ -1,5 +1,4 @@
 export const ImagesPath = {
-    spalshScreen: require(`../Assests/Images/forex-signal.png`),
     images: require(`../Assests/Images/images.jpg`),
     facebookImages: require(`../Assests/Images/facebookImages.png`),
     GoogleImages: require(`../Assests/Images/GoogleImages.png`),
@@ -31,4 +30,5 @@ export const ImagesPath = {
     eyeImage: require(`../Assests/Images/eyeImage.png`),
     eyeSlashImage: require(`../Assests/Images/eyeSlashImage.png`),
     eyeiconImge: require(`../Assests/Images/eyeiconImge.png`),
+    QuotexTradingBot: require(`../Assests/Images/QuotexTradingBot.jpg`),
 }

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
 import { ImagesPath } from '../../Constant/ImagePath';
 import CheckBox from '@react-native-community/checkbox';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Alluser from '../AdminChat/Alluser';
+import Toast from 'react-native-simple-toast';
+import firestore from '@react-native-firebase/firestore';
 
 const FxSignals = ({ navigation, refresh }) => {
     const [title, setTitle] = useState('');
@@ -51,6 +53,35 @@ const FxSignals = ({ navigation, refresh }) => {
     const handleChat = () => {
         setVisibleChat(true)
     }
+
+    const showToast = (text) => {
+        Toast.show(text, Toast.LONG);
+    };
+
+
+    const handleSend = async () => {
+        if (!signals) {
+            showToast('Signal message is empty');
+            return;
+        }
+
+        const currentDate = new Date();
+        const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+
+        const signalData = {
+            text: signals,
+            dateTime: formattedDate,
+            premium: checked2
+        };
+
+        try {
+            await firestore().collection('fxSignals').add(signalData);
+            console.log('Signal data saved successfully');
+            setSignals('');
+        } catch (error) {
+            console.error('Error saving signal data: ', error);
+        }
+    };
 
     return (
         <>
@@ -147,7 +178,7 @@ const FxSignals = ({ navigation, refresh }) => {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.sendButton}>
+                        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
                             <Text style={styles.sendButtonText}>send</Text>
                         </TouchableOpacity>
                     </View>

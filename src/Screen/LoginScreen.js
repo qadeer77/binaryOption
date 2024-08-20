@@ -71,6 +71,7 @@ const LoginScreen = ({ navigation }) => {
                 console.log("isAdmin=====>>>>>>> ", isAdmin);
                 if (isAdmin) {
                     navigation.replace('BottomTab');
+                    await AsyncStorage.setItem("isAdminLoggedIn", "true");
                 } else {
                     await auth().signInWithEmailAndPassword(username, password);
                     showToast("Sign-in successful!");

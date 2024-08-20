@@ -4,16 +4,36 @@ import firestore from '@react-native-firebase/firestore';
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
 import QuotexSignalPremium from '../SubComponent/QuotexSignalPremium';
+import { useNavigation } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 const QuotexSignalsChild = ({ onClose }) => {
     const [show, setShow] = useState(false);
+    const [forexPremiumSignals, setForexPremiumSignals] = useState(false);
     const [signals, setSignals] = useState([]);
+    const navigation = useNavigation();
 
     useEffect(() => {
+        const fetchUserEmail = async () => {
+            const user = auth().currentUser;
+            if (user) {
+                try {
+                    const userSnapshot = await firestore().collection('users').where('email', '==', user.email).get();
+                    if (!userSnapshot.empty) {
+                        const userData = userSnapshot.docs[0].data();
+                        setForexPremiumSignals(userData.premiumSignals);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user details: ", error);
+                }
+            }
+        };
+
         const fetchSignals = async () => {
             try {
                 const snapshot = await firestore().collection('signals').get();
                 const signalsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                signalsList.reverse()
                 setSignals(signalsList);
             } catch (error) {
                 console.error("Error fetching signals: ", error);
@@ -21,20 +41,25 @@ const QuotexSignalsChild = ({ onClose }) => {
         };
 
         fetchSignals();
+        fetchUserEmail()
     }, []);
 
     const handleContent = () => {
-        setShow(true);
+        setShow(!show);
     };
+
+    const handleClose = () => {
+        navigation.replace('home')
+    }
 
     return (
         <>
             {show ? (
-                <QuotexSignalPremium />
+                <QuotexSignalPremium onClose={handleContent} text={'Quotex'} />
             ) : (
                 <View style={styles.Container}>
                     <View style={styles.header}>
-                        <TouchableOpacity style={styles.menuIcon} onPress={onClose}>
+                        <TouchableOpacity style={styles.menuIcon} onPress={handleClose}>
                             <Image source={ImagesPath.BackIcon} />
                         </TouchableOpacity>
                         <Text style={styles.headerText}>Free Quotex Signal</Text>
@@ -47,11 +72,10 @@ const QuotexSignalsChild = ({ onClose }) => {
                     </TouchableOpacity>
                     {signals.length > 0 ? (
                         signals.map(signal => {
-                            console.log("signals======>>>>>> ", signal.premium);
                             return (
                                 <View style={styles.footerContainer}>
                                     <View key={signal.id} style={styles.signalItem}>
-                                        <Text style={signal.premium ? styles.signalTitle1 : styles.signalTitle}>{signal.text}</Text>
+                                        <Text style={signal.premium && !forexPremiumSignals ? styles.signalTitle1 : styles.signalTitle}>{signal.text}</Text>
                                         <Text style={styles.signalDate}>{signal.dateTime}</Text>
                                     </View>
                                 </View>

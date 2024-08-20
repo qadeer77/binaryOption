@@ -22,6 +22,10 @@ const DrawerScreen = ({ onClose, drawerTranslate }) => {
             });
     }
 
+    const handleHome = () => {
+        navigation.replace('home')
+    }
+
     return (
         <>
             <ScrollView>
@@ -32,7 +36,7 @@ const DrawerScreen = ({ onClose, drawerTranslate }) => {
                             <Image source={ImagesPath.BackIcon} />
                         </TouchableOpacity>
                         <View style={{ position: 'absolute', top: 100, left: 20, }}>
-                            <TouchableOpacity style={styles.contentContainer}>
+                            <TouchableOpacity style={styles.contentContainer} onPress={handleHome}>
                                 <Image source={ImagesPath.homeIcon} style={styles.image1} />
                                 <View style={{ marginLeft: 15 }}>
                                     <Text style={styles.text}>Home</Text>

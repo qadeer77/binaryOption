@@ -5,10 +5,13 @@ import { ImagesPath } from '../../Constant/ImagePath';
 import CheckBox from '@react-native-community/checkbox';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Alluser from '../AdminChat/Alluser';
-import firestore from '@react-native-firebase/firestore'; 
+import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-simple-toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginScreen from '../../Screen/LoginScreen';
+import { useNavigation } from '@react-navigation/native';
 
-const BinaryPanel = ({ navigation, refresh }) => {
+const BinaryPanel = ({ refresh }) => {
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [signals, setSignals] = useState('');
@@ -19,6 +22,8 @@ const BinaryPanel = ({ navigation, refresh }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
     const [visibleChat, setVisibleChat] = useState(false);
+    const [showLoginScreen, setShowLoginScreen] = useState(false);
+    const navigate = useNavigation()
 
     useEffect(() => {
     }, [refresh]);
@@ -71,7 +76,7 @@ const BinaryPanel = ({ navigation, refresh }) => {
         try {
             await firestore().collection('signals').add(signalData);
             console.log('Signal data saved successfully');
-            setSignals(''); 
+            setSignals('');
         } catch (error) {
             console.error('Error saving signal data: ', error);
         }
@@ -81,10 +86,18 @@ const BinaryPanel = ({ navigation, refresh }) => {
         Toast.show(text, Toast.LONG);
     };
 
+    const handleLogout = async() => {
+        // setShowLoginScreen(!showLoginScreen)
+        navigate.navigate('login')
+        await AsyncStorage.setItem("isAdminLoggedIn", "false");
+    }
+
     return (
         <>
             {visibleChat ? (
                 <Alluser />
+            ) : showLoginScreen ? (
+                <LoginScreen/>
             ) : (
                 <ScrollView>
                     <View style={styles.container}>
@@ -98,9 +111,9 @@ const BinaryPanel = ({ navigation, refresh }) => {
                                     <TouchableOpacity style={styles.tooltipOption} onPress={handleChat}>
                                         <Text style={styles.tooltipText}>Chat</Text>
                                     </TouchableOpacity>
-                                    {/* <TouchableOpacity style={styles.tooltipOption}>
-                                <Text style={styles.tooltipText}>Option 2</Text>
-                            </TouchableOpacity> */}
+                                    <TouchableOpacity style={styles.tooltipOption} onPress={handleLogout}>
+                                        <Text style={styles.tooltipText}>Logout</Text>
+                                    </TouchableOpacity>
                                 </View>
                             )}
                         </View>
@@ -320,6 +333,9 @@ const styles = StyleSheet.create({
         right: 70,
         borderRadius: 10,
         padding: 5,
+        height: 200,
+        width: 80,
+        alignItems: 'center',
         // shadowColor: '#000',
         // shadowOffset: {
         //     width: 0,
@@ -328,10 +344,12 @@ const styles = StyleSheet.create({
         // shadowOpacity: 0.25,
         // shadowRadius: 3.84,
         // elevation: 5,
-        zIndex: 2,
+        zIndex: 10,
     },
     tooltipOption: {
-        padding: 10,
+        // padding: 10,
+        marginBottom: 5,
+        fontSize: 15
     },
     tooltipText: {
         fontSize: 16,

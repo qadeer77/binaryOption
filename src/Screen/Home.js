@@ -7,11 +7,14 @@ import HomeChild from '../Components/HomeChild';
 import CustomAlert from '../Components/CustomAlert';
 import Chat from '../Components/Chat';
 import QuotexSignalsChild from '../Components/QuotexSignalsChild';
+import Svg from 'react-native-svg'; 
+import ForexSignalsChild from '../Components/ForexSignalsChild';
 
 const Home = ({ navigation }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isShow, setIsShow] = useState(false);
     const [isShowQuotexSignal, setIsShowQuotexSignal] = useState(false);
+    const [isShowForexSignal, setIsShowForexSignal] = useState(false);
     const [isAlert, setIsAlert] = useState(false);
     const [isChatActive, setIsChatActive] = useState(false); 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -42,12 +45,11 @@ const Home = ({ navigation }) => {
 
 
     const data = [
-        { id: 1, image: ImagesPath.binarySignalImages, text: 'Quotex Signals' },
-        { id: 2, image: ImagesPath.binarySignalImages, text: 'Quotex Trading Bot' },
+        { id: 1, image: ImagesPath.QuotexTradingBot, text: 'Quotex Signals' },
+        { id: 2, image: ImagesPath.eyeiconImge, text: 'Quotex Trading Bot' },
         { id: 3, image: ImagesPath.PdfImages, text: 'Quotex Trading Course' },
         { id: 4, image: ImagesPath.VideoCourse, text: 'Forex Signals' },
         { id: 5, image: ImagesPath.liveCourse, text: 'Forex Course' },
-        // { id: 6, image: ImagesPath.FollowUs, text: 'Follow Us' },
         { id: 6, image: ImagesPath.contactUs, text: 'Contact Us' },
     ];
 
@@ -58,16 +60,21 @@ const Home = ({ navigation }) => {
 
 
     const handleBox = (item) => {
-        console.log("item====>>>>> ", item);
         if (item.text === 'Contact Us') {
             setIsAlert(true)
         } else if (item.text === 'Quotex Signals') {
-            setIsShowQuotexSignal(true)
-        } else {
+            setIsShowQuotexSignal(!isShowQuotexSignal)
+        }
+        else if (item.text === 'Forex Signals') {
+            setIsShowForexSignal(!isShowForexSignal)
+        }  
+        else {
             setSelectedItem(item);
             setIsShow(!isShow);
         }
     };
+
+    // Saki10837882
 
     return (
         <>
@@ -79,6 +86,8 @@ const Home = ({ navigation }) => {
                 <Chat/>
             ) : isShowQuotexSignal ? (
                 <QuotexSignalsChild/>
+            ) : isShowForexSignal ? (
+                <ForexSignalsChild/>
             ) : (
                 <>
                     <ScrollView>
@@ -150,7 +159,7 @@ const styles = StyleSheet.create({
     image: {
         width: 100,
         height: 100,
-        marginBottom: 15,
+        resizeMode: 'cover',
     },
     boxText: {
         fontSize: 18,

@@ -6,7 +6,6 @@ import Toast from 'react-native-simple-toast';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import firestore from '@react-native-firebase/firestore';
 
 const SignupScreen = ({ navigation }) => {
@@ -43,7 +42,12 @@ const SignupScreen = ({ navigation }) => {
                 const user = userCredential.user;
                 await firestore().collection('users').doc(user.uid).set({
                     name: name,
-                    email: username
+                    email: username,
+                    forexPremiumSignals: false,
+                    overridePremiumSignals: false,
+                    premiumSignals: false,
+                    purchasedActionBook: false,
+                    purchasedPaidCourse: false
                 });
                 
                 navigation.replace('home');
@@ -105,33 +109,6 @@ const SignupScreen = ({ navigation }) => {
             console.log("error=====>>>> ", error);
         }
     }
-
-    const handleFacebook = async () => {
-        try {
-            const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
-
-            if (result.isCancelled) {
-                showToast('Facebook Sign-In cancelled');
-                return;
-            }
-
-            const data = await AccessToken.getCurrentAccessToken();
-
-            if (!data) {
-                showToast('Something went wrong obtaining access token');
-                return;
-            }
-
-            const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-            await auth().signInWithCredential(facebookCredential);
-            showToast('Facebook Sign-In successful');
-            navigation.replace('home');
-            await AsyncStorage.setItem("isLoggedIn", "true");
-        } catch (error) {
-            console.log("error=====>>>> ", error);
-            showToast('Facebook Sign-In failed');
-        }
-    };
 
     return (
         <>

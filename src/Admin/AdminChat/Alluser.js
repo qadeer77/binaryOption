@@ -1,39 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, TextInput } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
-import firestore from '@react-native-firebase/firestore';
-import AdminChat from './AdminChat';
 import database from '@react-native-firebase/database';
+import AdminChat from './AdminChat';
 
 const Alluser = ({ navigation }) => {
     const [isShow, setIsShow] = useState(false);
     const [data, setData] = useState({});
     const [allUsers, setAllUsers] = useState([]);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [usersWithNewMessages, setUsersWithNewMessages] = useState([]);
 
     useEffect(() => {
-        setLoading(true)
         const fetchUsers = async () => {
+            setLoading(true);
             try {
                 const usersSnapshot = await database().ref('chates').once('value');
-                const emails = usersSnapshot.val() ? Object.keys(usersSnapshot.val()) : [];
-                console.log("emails====>>>>> ", emails);
-                setFilteredUsers(emails);
-                setAllUsers(emails)
+                const usersData = usersSnapshot.val() || {};
+                const emails = Object.keys(usersData);
+
+                const sortedEmails = emails.sort((a, b) => {
+                    const aTimestamp = usersData[a].lastMessageTimestamp || 0;
+                    const bTimestamp = usersData[b].lastMessageTimestamp || 0;
+                    return bTimestamp - aTimestamp;
+                });
+
+                const usersWithNewMessages = sortedEmails.filter(email => usersData[email].hasNewMessage);
+
+                setFilteredUsers(sortedEmails);
+                setAllUsers(sortedEmails);
+                setUsersWithNewMessages(usersWithNewMessages);
             } catch (error) {
                 console.error('Error fetching users: ', error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         };
 
         fetchUsers();
+
+        // Set up a real-time listener for changes in the 'chates' node
+        const onValueChange = database().ref('chates').on('value', (snapshot) => {
+            const usersData = snapshot.val() || {};
+            const emails = Object.keys(usersData);
+
+            const sortedEmails = emails.sort((a, b) => {
+                const aTimestamp = usersData[a].lastMessageTimestamp || 0;
+                const bTimestamp = usersData[b].lastMessageTimestamp || 0;
+                return bTimestamp - aTimestamp;
+            });
+
+            const usersWithNewMessages = sortedEmails.filter(email => usersData[email].hasNewMessage);
+
+            setFilteredUsers(sortedEmails);
+            setAllUsers(sortedEmails);
+            setUsersWithNewMessages(usersWithNewMessages);
+        });
+
+        // Clean up the listener on component unmount
+        return () => database().ref('chates').off('value', onValueChange);
     }, []);
 
     useEffect(() => {
-        if (searchQuery.trim() === '') {
+        if (searchQuery.trim() === "") {
             setFilteredUsers(allUsers);
         } else {
             const filtered = allUsers.filter((email) =>
@@ -43,23 +74,29 @@ const Alluser = ({ navigation }) => {
         }
     }, [searchQuery, allUsers]);
 
-    const handleItem = (item, email) => {
+    const handleItem = async (item, email) => {
         setIsShow(!isShow);
         setData({ item, email });
+
+        // Reset the hasNewMessage field for the user when the admin opens the chat
+        await database().ref('/chates/' + email).update({ hasNewMessage: false });
     };
 
     const renderItem = ({ item }) => {
+        const email = item;
+        const hasNewMessage = usersWithNewMessages.includes(email);
+
         return (
-            <TouchableOpacity style={styles.itemContainer} onPress={() => handleItem(item)}>
+            <TouchableOpacity style={styles.itemContainer} onPress={() => handleItem(item, email)}>
                 <View style={styles.textContainer}>
-                    <Text style={styles.name}>{item.name}</Text>
+                    <Text style={styles.name}>{email.split('@')[0]}</Text>
+                    {hasNewMessage && (
+                        <View style={styles.notificationBadge} />
+                    )}
                 </View>
             </TouchableOpacity>
-        )
+        );
     };
-
-
-    // request.auth != null
 
     return (
         <>
@@ -80,17 +117,10 @@ const Alluser = ({ navigation }) => {
                         <ScrollView>
                             {filteredUsers.length > 0 ? (
                                 filteredUsers.map((item) => {
-                                    const email = item.split('@')[0]
-                                    return (
-                                        <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => handleItem(item, email)}>
-                                            <View style={styles.textContainer}>
-                                                <Text style={styles.name}>{email}</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    )
+                                    return renderItem({ item });
                                 })
                             ) : (
-                                <></>
+                                <Text>No users found</Text>
                             )}
                         </ScrollView>
                     )}
@@ -136,14 +166,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    role: {
-        fontSize: 14,
-        color: '#555',
-    },
-    location: {
-        fontSize: 12,
-        color: '#888',
-    },
+    notificationBadge: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: 'red',
+        marginLeft: 10
+    }
 });
 
 export default Alluser;

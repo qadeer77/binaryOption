@@ -15,19 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "633515924228-9m3lto9nk9llruurvhbuqmj57hq14jug.apps.googleusercontent.com",
+          "client_id": "633515924228-nvlq2j6agu52mq8e9ckrei8vso6sadps.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.forexadminpanel",
-            "certificate_hash": "ed39a21e2c6b7c7ec97dbf3632a2896640e8590b"
-          }
-        },
-        {
-          "client_id": "633515924228-kgelg1i4t1jrobgag1l78tu8pmlj6fd6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.forexadminpanel",
-            "certificate_hash": "ad5f8771f44dfa99963f9c4b9151cadfcb347b1a"
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {

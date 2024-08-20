@@ -1,9 +1,7 @@
-import {React, useEffect} from 'react';
+import { React, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
-import RNIap from 'react-native-iap';
-
 
 const itemSkus = [
     'subscription_1_month',
@@ -16,57 +14,37 @@ const subscriptionOptions = [
         id: '1',
         duration: '1 Month Subscription',
         price: 'Rs 35$',
-        benefits: '• Unlimited Premium Binary Signals (Minimum 10 signals per day)'
+        benefits: '• Unlimited Premium Binary Signals (Minimum 10 signals per day)',
     },
     {
         id: '2',
         duration: '3 Months Subscription',
         price: 'Rs 70$',
-        benefits: '• Unlimited Premium Binary Signals (Minimum 10 signals per day)\n• Additional Exclusive Signals'
+        benefits: '• Unlimited Premium Binary Signals (Minimum 10 signals per day)\n• Additional Exclusive Signals',
     },
     {
         id: '3',
         duration: 'Lifetime Subscription',
         price: 'Rs 120$',
-        benefits: '• Unlimited Premium Binary Signals (Minimum 10 signals per day)\n• VIP Support\n• Exclusive Market Insights'
+        benefits: '• Unlimited Premium Binary Signal (Minimum 10 signals per day)\n• VIP Support\n• Exclusive Market Insights',
     },
 ];
 
-const QuotexSignalPremium = ({ onClose, data }) => {
+const QuotexSignalPremium = ({ onClose, text }) => {
 
 
-    useEffect(() => {
-        const initIap = async () => {
-            try {
-                await RNIap.initConnection();
-                await RNIap.getSubscriptions(itemSkus); 
-            } catch (err) {
-                console.warn('Error initializing IAP connection', err);
-            }
-        };
-        initIap();
-
-        return () => {
-        };
-    }, []);
-
-
-    const purchaseSubscription = async(itemId) => {
-        try {
-            const purchase = await RNIap.requestSubscription(itemId);
-            console.log('Purchase successful', purchase);
-        } catch (err) {
-            console.warn('Purchase failed', err);
-        }
+    const handlePress = () => {
+        console.log("hellooo");
+        
     }
 
     return (
-        <View style={styles.Container}>
+        <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity style={styles.menuIcon} onPress={onClose} accessibilityLabel="Close">
                     <Image source={ImagesPath.BackIcon} style={styles.iconImage} />
                 </TouchableOpacity>
-                <Text style={styles.headerText}>Quotex Specialist</Text>
+                <Text style={styles.headerText}>{`${text} Specialist`}</Text>
             </View>
             <View style={styles.content}>
                 <Text style={styles.title}>
@@ -82,10 +60,10 @@ const QuotexSignalPremium = ({ onClose, data }) => {
                     • You can cancel the subscription anytime before the next billing cycle through the Play Store app.
                 </Text>
             </View>
-            <ScrollView style={styles.subscriptionList}>
+            <View style={styles.subscriptionList}>
                 {subscriptionOptions.map((option) => (
                     <View key={option.id} style={styles.subscriptionContainer}>
-                        <TouchableOpacity style={styles.subscriptionButton} onPress={() => purchaseSubscription(option.id)}>
+                        <TouchableOpacity style={styles.subscriptionButton} onPress={handlePress}>
                             <Text style={styles.subscriptionText}>
                                 {option.duration} For Premium Forex Signals {option.price}
                             </Text>
@@ -98,13 +76,13 @@ const QuotexSignalPremium = ({ onClose, data }) => {
                         </TouchableOpacity>
                     </View>
                 ))}
-            </ScrollView>
-        </View>
-    )
+            </View>
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
-    Container: {
+    container: {
         flex: 1,
         backgroundColor: 'white',
     },
@@ -118,25 +96,20 @@ const styles = StyleSheet.create({
     menuIcon: {
         marginRight: 15,
     },
-    iconImage: {
-        width: 24,
-        height: 24,
-    },
     headerText: {
         color: 'white',
         fontSize: 20,
         flex: 1,
     },
     content: {
-        flex: 1,
         marginHorizontal: 20,
-        marginTop: 10
+        marginTop: 10,
     },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
-        color: 'black'
+        color: 'black',
     },
     description: {
         fontSize: 16,
@@ -145,8 +118,7 @@ const styles = StyleSheet.create({
     },
     subscriptionList: {
         marginHorizontal: 20,
-        position: 'absolute',
-        bottom: 0
+        marginBottom: 20,
     },
     subscriptionContainer: {
         marginBottom: 10,

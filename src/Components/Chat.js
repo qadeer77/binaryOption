@@ -49,10 +49,15 @@ const Chat = ({ onClose }) => {
             text: message.trim(),
             timestamp: Date.now(),
             user: user,
-            isAdmin: false // User messages should not be marked as isAdmin
+            isAdmin: false 
         };
 
         database().ref('/chates/' + user + '/messages').push(newMessage);
+
+        database().ref('/chates/' + user).update({
+            lastMessageTimestamp: newMessage.timestamp,
+            hasNewMessage: true
+        });
 
         setMessage('');
     }

@@ -8,8 +8,11 @@ const SplashScreen = ({ navigation }) => {
     useEffect(() => {
         const timeout = setTimeout(async () => {
             const storage = await AsyncStorage.getItem('isLoggedIn');
+            const isAdminLoggedIn = await AsyncStorage.getItem('isAdminLoggedIn');
             if (storage == "true") {
                 navigation.replace('home')
+            } else if (isAdminLoggedIn == 'true') {
+                navigation.replace('BottomTab');
             }
             else {
                 navigation.replace('login');
@@ -28,7 +31,7 @@ const SplashScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Image source={ImagesPath.spalshScreen} style={styles.image} />
+            <Image source={require('../Assests/Images/forexSignal.png')} style={styles.image} />
             <View style={styles.overlay}>
                 <Text style={{ color: AppColors.PrimaryWhite, fontSize: 20 }}>Binary Option And Forest Signals</Text>
             </View>
