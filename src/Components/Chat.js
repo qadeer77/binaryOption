@@ -32,8 +32,20 @@ const Chat = ({ onClose }) => {
             }
         });
 
+
+        const userStatusRef = database().ref('/usersOnline/' + sanitizedEmail + '/status');
+        userStatusRef.set('online');
+
+        const handleDisconnect = () => userStatusRef.set('offline');
+        database().ref('.info/connected').on('value', snapshot => {
+            if (snapshot.val() === true) {
+                userStatusRef.onDisconnect().set('offline');
+            }
+        });
+
         return () => {
             messagesRef.off('value');
+            handleDisconnect();
         };
     }, []);
 

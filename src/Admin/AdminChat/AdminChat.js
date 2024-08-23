@@ -13,15 +13,12 @@ const AdminChat = ({ onClose, data }) => {
     const [message, setMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-
-    useEffect(() => {
-        console.log("data===>>>>>> ", data);
-    }, [])
+    const [userStatus, setUserStatus] = useState('offline');
 
     let sanitizedEmail = sanitizeEmail(data.item);
     useEffect(() => {
         const messagesRef = database().ref('/chates/' + sanitizedEmail + '/messages');
+        const statusRef = database().ref('/users/' + sanitizedEmail + '/status');
         messagesRef.on('value', snapshot => {
             const messages = snapshot.val();
             if (messages) {
@@ -30,7 +27,14 @@ const AdminChat = ({ onClose, data }) => {
             }
         });
 
-        return () => messagesRef.off('value');
+        statusRef.on('value', snapshot => {
+            setUserStatus(snapshot.val());
+        });
+
+        return () => {
+            messagesRef.off('value');
+            statusRef.off('value');
+        }
     }, [sanitizedEmail]);
 
     const handleSend = () => {
@@ -41,7 +45,7 @@ const AdminChat = ({ onClose, data }) => {
             text: message.trim(),
             timestamp: Date.now(),
             user: data.email,
-            isAdmin: true // Admin messages should be marked as isAdmin
+            isAdmin: true 
         };
 
         database().ref('/chates/' + sanitizedEmail + '/messages').push(newMessage);
@@ -72,6 +76,9 @@ const AdminChat = ({ onClose, data }) => {
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{data.email}</Text>
                 <Text></Text>
+                <Text style={[{ color: userStatus === 'online' ? 'green' : 'red', position: 'absolute', bottom: 2, left: '50%', fontSize: 15 }]}>
+                    {userStatus === 'online' ? 'Online' : 'Offline'}
+                </Text>
             </View>
 
             <ScrollView style={styles.chatContainer}>
@@ -122,7 +129,7 @@ const AdminChat = ({ onClose, data }) => {
 
 const styles = StyleSheet.create({
     header: {
-        height: 60,
+        height: 70,
         backgroundColor: AppColors.header,
         flexDirection: 'row',
         alignItems: 'center',

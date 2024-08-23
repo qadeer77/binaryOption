@@ -17,7 +17,6 @@ const Users = ({ navigation }) => {
             try {
                 const usersCollection = await firestore().collection('users').get();
                 const usersList = usersCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("usersList====>>>>>>> ", usersList);
                 setAllUsers(usersList);
             } catch (error) {
                 console.error('Error fetching users: ', error);

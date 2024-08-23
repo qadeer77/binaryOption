@@ -21,7 +21,7 @@ const ForexSignalsChild = ({ onClose }) => {
                     const userSnapshot = await firestore().collection('users').where('email', '==', user.email).get();
                     if (!userSnapshot.empty) {
                         const userData = userSnapshot.docs[0].data();
-                        setForexPremiumSignals(userData.premiumSignals);
+                        setForexPremiumSignals(userData.forexPremiumSignals);
                     }
                 } catch (error) {
                     console.error("Error fetching user details: ", error);

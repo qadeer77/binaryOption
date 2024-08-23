@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Image, Switch } from '
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
 import Chat from './Chat';
+import firestore from '@react-native-firebase/firestore';
 
 const CustomAlert = ({ visible, onClose, data, datas, parentChat }) => {
     const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
@@ -14,7 +15,6 @@ const CustomAlert = ({ visible, onClose, data, datas, parentChat }) => {
     const [isChat, setIsChat] = useState(false);
 
     useEffect(() => {
-        console.log("data======>>>>> ", data);
         if (data) {
             setPushNotificationEnabled(data.isSubscribed);
         }
@@ -26,6 +26,31 @@ const CustomAlert = ({ visible, onClose, data, datas, parentChat }) => {
         }
     }, [isChat]);
 
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userSnapshot = await firestore()
+                    .collection('users')
+                    .where('email', '==', data?.email)
+                    .get();
+
+                if (!userSnapshot.empty) {
+                    const userData = userSnapshot.docs[0].data();
+                    setPushNotificationEnabled2(userData?.overridePremiumSignals);
+                    setPushNotificationEnabled3(userData?.forexPremiumSignals)
+                }
+                else {
+                    console.log("helllo Qadeer");
+
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     const handleToggleSwitch = () => {
         setPushNotificationEnabled(previousState => !previousState);
     };
@@ -34,12 +59,42 @@ const CustomAlert = ({ visible, onClose, data, datas, parentChat }) => {
         setPushNotificationEnabled1(previousState => !previousState);
     };
 
-    const handleToggleSwitch2 = () => {
-        setPushNotificationEnabled2(previousState => !previousState);
+    const handleToggleSwitch2 = async () => {
+        const newValue = !pushNotificationEnabled2;
+        setPushNotificationEnabled2(newValue);
+
+        try {
+            await firestore()
+                .collection('users')
+                .where('email', '==', data?.email)
+                .get()
+                .then(querySnapshot => {
+                    querySnapshot.docs.forEach(async (doc) => {
+                        await doc.ref.update({ overridePremiumSignals: newValue });
+                    });
+                });
+        } catch (error) {
+            console.error('Error updating user data:', error);
+        }
     };
 
-    const handleToggleSwitch3 = () => {
-        setPushNotificationEnabled3(previousState => !previousState);
+    const handleToggleSwitch3 = async () => {
+        const newValue = !pushNotificationEnabled3;
+        setPushNotificationEnabled3(newValue);
+
+        try {
+            await firestore()
+                .collection('users')
+                .where('email', '==', data?.email)
+                .get()
+                .then(querySnapshot => {
+                    querySnapshot.docs.forEach(async (doc) => {
+                        await doc.ref.update({ forexPremiumSignals: newValue });
+                    });
+                });
+        } catch (error) {
+            console.error('Error updating user data:', error);
+        }
     };
 
     const handleToggleSwitch4 = () => {
@@ -152,7 +207,7 @@ const CustomAlert = ({ visible, onClose, data, datas, parentChat }) => {
     return (
         <>
             {isChat ? (
-                <Chat/>
+                <Chat />
             ) : (
                 <Modal transparent animationType="slide" visible={visible}>
                     <View style={styles.modalContainer}>
