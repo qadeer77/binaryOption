@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { AppColors } from '../Constant/AppColor';
 import { ImagesPath } from '../Constant/ImagePath';
@@ -10,8 +10,8 @@ import auth from '@react-native-firebase/auth';
 const ForexSignalsChild = ({ onClose }) => {
     const [show, setShow] = useState(false);
     const [signals, setSignals] = useState([]);
-    const navigation = useNavigation();
     const [forexPremiumSignals, setForexPremiumSignals] = useState(false);
+    const navigation = useNavigation();
 
     useEffect(() => {
         const fetchUserEmail = async () => {
@@ -33,8 +33,7 @@ const ForexSignalsChild = ({ onClose }) => {
             try {
                 const snapshot = await firestore().collection('fxSignals').get();
                 const signalsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("signalsList=====>>>>>> ", signalsList);
-                signalsList.reverse()
+                signalsList.reverse();
                 setSignals(signalsList);
             } catch (error) {
                 console.error("Error fetching signals: ", error);
@@ -42,7 +41,7 @@ const ForexSignalsChild = ({ onClose }) => {
         };
 
         fetchSignals();
-        fetchUserEmail()
+        fetchUserEmail();
     }, []);
 
     const handleContent = () => {
@@ -50,43 +49,47 @@ const ForexSignalsChild = ({ onClose }) => {
     };
 
     const handleClose = () => {
-        navigation.replace('home')
-    }
-    
+        navigation.replace('home');
+    };
 
     return (
         <>
             {show ? (
-                <QuotexSignalPremium onClose={handleContent} text={'Forex'}/>
+                <QuotexSignalPremium onClose={handleContent} text={'Forex'} />
             ) : (
                 <View style={styles.Container}>
                     <View style={styles.header}>
                         <TouchableOpacity style={styles.menuIcon} onPress={handleClose}>
                             <Image source={ImagesPath.BackIcon} />
                         </TouchableOpacity>
-                        <Text style={styles.headerText}>Free Forex Signal</Text>
+                        <Text style={styles.headerText}>{!forexPremiumSignals ? 'Free Forex Signal' : 'Forex Signal'}</Text>
                     </View>
-                    <TouchableOpacity style={styles.content} onPress={handleContent}>
-                        <Image source={ImagesPath.eyeiconImge} style={styles.image} />
-                        <Text style={styles.infoText}>
-                            You are seeing free limited signals. Click here or any premium signal to buy premium Forex signals subscription.
-                        </Text>
-                    </TouchableOpacity>
-                    {signals.length > 0 ? (
-                        signals.map(signal => {
-                            console.log("signals======>>>>>> ", signal.premium);
-                            return (
-                                <View style={styles.footerContainer}>
-                                    <View key={signal.id} style={styles.signalItem}>
-                                        <Text style={signal.premium && !forexPremiumSignals ? styles.signalTitle1 : styles.signalTitle}>{signal.text}</Text>
+                    {!forexPremiumSignals ? (
+                        <TouchableOpacity style={styles.content} onPress={handleContent}>
+                            <Image source={ImagesPath.eyeiconImge} style={styles.image} />
+                            <Text style={styles.infoText}>
+                                You are seeing free limited signals. Click here or any premium signal to buy premium Forex signals subscription.
+                            </Text>
+                        </TouchableOpacity>
+                    ) : (
+                        null
+                    )}
+                    <ScrollView contentContainerStyle={styles.scrollContainer}>
+                        {signals.length > 0 ? (
+                            signals.map(signal => (
+                                <View key={signal.id} style={styles.footerContainer}>
+                                    <View style={styles.signalItem}>
+                                        <Text style={signal.premium && !forexPremiumSignals ? styles.signalTitle1 : styles.signalTitle}>
+                                            {signal.text} {signal.premium && forexPremiumSignals ? '👑' : ''}
+                                        </Text>
                                         <Text style={styles.signalDate}>{signal.dateTime}</Text>
                                     </View>
                                 </View>
-                            )
-                        })
-                    ) : (
-                        <Text>No signals available.</Text>
-                    )}
+                            ))
+                        ) : (
+                            <Text>No signals available.</Text>
+                        )}
+                    </ScrollView>
                 </View>
             )}
         </>
@@ -131,6 +134,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
     },
+    scrollContainer: {
+        padding: 20,
+    },
     footerContainer: {
         backgroundColor: 'white',
         padding: 20,
@@ -143,16 +149,6 @@ const styles = StyleSheet.create({
         elevation: 2,
         marginHorizontal: 10
     },
-    footerHeading: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    footerDate: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 5,
-    },
     signalItem: {
         marginBottom: 10,
     },
@@ -164,7 +160,9 @@ const styles = StyleSheet.create({
     signalTitle1: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'transparent', textShadowColor: '#000', textShadowRadius: 60
+        color: 'transparent',
+        textShadowColor: '#000',
+        textShadowRadius: 60
     },
     signalDate: {
         fontSize: 14,

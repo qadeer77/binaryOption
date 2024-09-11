@@ -75,6 +75,7 @@ const Home = ({ navigation }) => {
     };
 
     // Saki10837882
+    // mynameisknowledgebank@gmail.com
 
     return (
         <>

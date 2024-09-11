@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import messaging from '@react-native-firebase/messaging';
 
 const LoginScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const LoginScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
     const [admins, setAdmins] = useState([]);
+    const [token, setToken] = useState(null);
 
     const handleRegister = () => {
         navigation.replace('signUpScreen');
@@ -27,9 +29,20 @@ const LoginScreen = ({ navigation }) => {
         });
     }, []);
 
+    useEffect(() => {
+        const fetchToken = async () => {
+            try {
+                const token = await messaging().getToken();
+                setToken(token);
+            } catch (error) {
+                console.error("Error fetching token: ", error);
+            }
+        };
+        fetchToken()
+    }, [])
+
 
     useEffect(() => {
-
         const fetchAdmins = async () => {
             try {
                 const adminCollection = await firestore().collection('admins').get();
@@ -72,8 +85,17 @@ const LoginScreen = ({ navigation }) => {
                 if (isAdmin) {
                     navigation.replace('BottomTab');
                     await AsyncStorage.setItem("isAdminLoggedIn", "true");
+                    const adminTokenRef = firestore().collection('admin_tokens').doc('admin');
+                    await adminTokenRef.set({ sender : token }, { merge: true });
                 } else {
-                    await auth().signInWithEmailAndPassword(username, password);
+                    let userCredential = await auth().signInWithEmailAndPassword(username, password);
+                    const userId = userCredential.user.uid;
+
+                    await firestore().collection('users').doc(userId).set({    
+                        receiver: token,
+                        login: true,
+                    }, { merge: true });
+                    
                     showToast("Sign-in successful!");
                     navigation.replace('home');
                     await AsyncStorage.setItem("isLoggedIn", "true");
@@ -107,7 +129,7 @@ const LoginScreen = ({ navigation }) => {
 
     const validateInputs = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
         if (!username && !password) {
             showToast('Please fill in all fields');
@@ -123,12 +145,43 @@ const LoginScreen = ({ navigation }) => {
         }
     };
 
-    const handleGoogle = async() => {
+    const handleGoogle = async () => {
         try {
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-            const { idToken } = await GoogleSignin.signIn();
+            const { idToken, user } = await GoogleSignin.signIn();
             const googleCredential = auth.GoogleAuthProvider.credential(idToken);
             await auth().signInWithCredential(googleCredential);
+
+            const userDocRef = firestore().collection('users').doc(user.id);
+            console.log("user=====>>>id=====>>>> ", user);
+            
+
+            const userDoc = await userDocRef.get();
+
+            if (!userDoc.exists) {
+                console.log('Document does not exist. Creating...');
+                await userDocRef.set({
+                    name: `${user.givenName} ${user.familyName}`,
+                    email: user.email,
+                    forexPremiumSignals: false,
+                    overridePremiumSignals: false,
+                    premiumSignals: false,
+                    purchasedActionBook: false,
+                    purchasedPaidCourse: false,
+                    receiver: token,
+                    login: true,
+                });
+            } else {
+                
+                const existingData = userDoc.data();
+                if (existingData.receiver !== token) {
+                    await userDocRef.update({
+                        receiver: token,
+                        login: true,
+                    });
+                }
+            }
+
             showToast('Google Sign-In successful');
             navigation.replace('home');
             await AsyncStorage.setItem("isLoggedIn", "true");

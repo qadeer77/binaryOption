@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
-import { AppColors } from '../../Constant/AppColor';
-import { ImagesPath } from '../../Constant/ImagePath';
-import CustomAlert from '../../Components/CustomAlert';
+import { View, StyleSheet, Text, TouchableOpacity, TextInput, FlatList, ActivityIndicator } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import CustomAlert from '../../Components/CustomAlert';
+import { AppColors } from '../../Constant/AppColor';
 
 const Users = ({ navigation }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
-    const [IsShow, setIsShow] = useState(false);
-    const [IsUsers, setUsers] = useState({});
+    const [isShow, setIsShow] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
+    const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -18,8 +18,11 @@ const Users = ({ navigation }) => {
                 const usersCollection = await firestore().collection('users').get();
                 const usersList = usersCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setAllUsers(usersList);
+                setFilteredUsers(usersList); 
             } catch (error) {
                 console.error('Error fetching users: ', error);
+            } finally {
+                setLoading(false)
             }
         };
 
@@ -28,17 +31,13 @@ const Users = ({ navigation }) => {
 
     const handleSearch = (text) => {
         setSearchTerm(text);
-        if (text.length >= 4) {
-            const filtered = allUsers.filter(user => user.email.toLowerCase().includes(text.toLowerCase()));
-            setFilteredUsers(filtered);
-        } else {
-            setFilteredUsers([]);
-        }
+        const filtered = allUsers.filter(user => user.email.toLowerCase().includes(text.toLowerCase()));
+        setFilteredUsers(filtered);
     };
 
     const handleUserPress = (user) => {
-        setUsers(user)
-        setIsShow(!IsShow)
+        setSelectedUser(user);
+        setIsShow(!isShow);
     };
 
     return (
@@ -49,25 +48,33 @@ const Users = ({ navigation }) => {
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="Search by email (min 4 characters)"
+                    placeholder="Search by email"
                     value={searchTerm}
                     onChangeText={handleSearch}
                 />
             </View>
-            <FlatList
-                data={filteredUsers}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleUserPress(item)}>
-                        <View style={styles.userItem}>
-                            <Text style={styles.userName}>{item.name}</Text>
-                            <Text style={styles.userEmail}>{item.email}</Text>
-                        </View>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={<Text style={styles.noResultsText}>No results found</Text>}
-            />
-            {IsShow && <CustomAlert data={IsUsers} onClose={handleUserPress} datas={'users'}/>}
+            {loading ? (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator size="large" color={AppColors.blue} />
+                </View>
+            ) : (
+                <FlatList
+                    data={filteredUsers}
+                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => handleUserPress(item)}>
+                            <View style={styles.userItem}>
+                                <Text style={styles.userName}>{item.name}</Text>
+                                <Text style={styles.userEmail}>{item.email}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={<Text style={styles.noResultsText}>No results found</Text>}
+                />
+            )}
+            {isShow && selectedUser && (
+                <CustomAlert data={selectedUser} onClose={handleUserPress} datas={'users'} />
+            )}
         </>
     );
 };
@@ -80,13 +87,6 @@ const styles = StyleSheet.create({
         backgroundColor: AppColors.blue,
         height: 70,
         paddingHorizontal: 10,
-    },
-    menuIcon: {
-        marginRight: 25,
-    },
-    menuIconImage: {
-        width: 30,
-        height: 30,
     },
     headerText: {
         color: 'white',
@@ -102,6 +102,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
+    },
+    loaderContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     userItem: {
         padding: 10,

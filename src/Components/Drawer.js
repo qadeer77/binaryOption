@@ -6,20 +6,32 @@ import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-simple-toast';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import firestore from '@react-native-firebase/firestore';
 
 const DrawerScreen = ({ onClose, drawerTranslate }) => {
     const navigation = useNavigation();
 
-    const handleLogOut = () => {
-        auth()
-            .signOut()
-            .then(async () => {
+    const handleLogOut = async () => {
+        try {
+            const currentUser = auth().currentUser;
+            console.log("currentUser===>>>>>> ", currentUser.uid);
+            
+            if (currentUser) {
+                // const userDocRef = firestore().collection('users').doc(currentUser.uid);
+                // const doc = await userDocRef.get();
+                
+                // await userDocRef.update({
+                //     login: false,
+                // });
+                await auth().signOut();
                 Toast.show("Logout successful!", Toast.LONG);
-                navigation.replace('login')
+                navigation.replace('login');
                 await AsyncStorage.setItem("isLoggedIn", "false");
-            }).catch((error) => {
-                console.log("Error logging out:", error);
-            });
+            }
+
+        } catch (error) {
+            console.log("Error logging out:", error);
+        }
     }
 
     const handleHome = () => {

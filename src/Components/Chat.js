@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Keyboard, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { ImagesPath } from '../Constant/ImagePath';
 import { AppColors } from '../Constant/AppColor';
 import { useNavigation } from '@react-navigation/native';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
+import messaging from '@react-native-firebase/messaging';
+import axios from 'axios';
+import firestore from '@react-native-firebase/firestore';
 
 function sanitizeEmail(email) {
     return email.replace(/[.#$[\]]/g, '_');
@@ -17,11 +20,18 @@ const Chat = ({ onClose }) => {
     const [user, setUser] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [token, setToken] = useState(null);
+    const scrollViewRef = useRef();
 
     useEffect(() => {
         const currentUser = auth().currentUser;
         let sanitizedEmail = sanitizeEmail(currentUser.email);
         setUser(sanitizedEmail);
+
+        const userStatusRef = database().ref(`/usersmeagge/${sanitizedEmail}/status`);
+        const statusOnDisconnectRef = userStatusRef.onDisconnect().set('offline');
+
+        userStatusRef.set('online');
 
         const messagesRef = database().ref('/chates/' + sanitizedEmail + '/messages');
         messagesRef.on('value', snapshot => {
@@ -32,26 +42,42 @@ const Chat = ({ onClose }) => {
             }
         });
 
+        return () => {
+            console.log("unmount");
+            userStatusRef.set('offline');
+        };
+    }, []);
 
-        const userStatusRef = database().ref('/usersOnline/' + sanitizedEmail + '/status');
-        userStatusRef.set('online');
 
-        const handleDisconnect = () => userStatusRef.set('offline');
-        database().ref('.info/connected').on('value', snapshot => {
-            if (snapshot.val() === true) {
-                userStatusRef.onDisconnect().set('offline');
+    useEffect(() => {
+        const fetchAdminToken = async () => {
+            try {
+                const tokenDoc = await firestore().collection('admin_tokens').doc('admin').get();
+                setToken(tokenDoc.data().sender)
+            } catch (error) {
+                console.error('Error fetching admin token:', error);
             }
+        };
+
+        fetchAdminToken();
+    }, [])
+
+
+    useEffect(() => {
+        const unsubscribe = messaging().onMessage(async remoteMessage => {
+            console.log('A new FCM message arrived:', JSON.stringify(remoteMessage));
         });
 
-        return () => {
-            messagesRef.off('value');
-            handleDisconnect();
-        };
+        return unsubscribe;
     }, []);
 
     const handleBack = () => {
         navigation.replace('home');
     }
+
+    const scrollToEnd = () => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+    };
 
     const handleSend = async () => {
         setShowEmojiPicker(false);
@@ -61,18 +87,40 @@ const Chat = ({ onClose }) => {
             text: message.trim(),
             timestamp: Date.now(),
             user: user,
-            isAdmin: false 
+            isAdmin: false
         };
 
-        database().ref('/chates/' + user + '/messages').push(newMessage);
+        try {
+            await sendNotificationToBackend(token, newMessage)
 
-        database().ref('/chates/' + user).update({
-            lastMessageTimestamp: newMessage.timestamp,
-            hasNewMessage: true
-        });
-
-        setMessage('');
+            database().ref('/chates/' + user + '/messages').push(newMessage);
+            database().ref('/chates/' + user).update({
+                lastMessageTimestamp: newMessage.timestamp,
+                hasNewMessage: true
+            });
+            setMessage('');
+            scrollToEnd()
+        } catch (error) {
+            console.error("Error sending message or notification:", error);
+        }
     }
+
+
+    const sendNotificationToBackend = async (token, message) => {
+        try {
+            const response = await axios.post('https://binary-option-backahnd1.vercel.app/send-notification', {
+                token: token,
+                message: {
+                    title: message.user,
+                    body: message.text,
+                }
+            });
+
+            console.log('Notification sent:', response.data);
+        } catch (error) {
+            console.error('Error sending notification:', error);
+        }
+    };
 
     const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp);
@@ -99,7 +147,7 @@ const Chat = ({ onClose }) => {
                 <Text></Text>
             </View>
 
-            <ScrollView style={styles.chatContainer} keyboardShouldPersistTaps="handled">
+            <ScrollView style={styles.chatContainer} ref={scrollViewRef} onContentSizeChange={() => scrollToEnd()} keyboardShouldPersistTaps="handled">
                 {chatMessages.map((msg, index) => (
                     <View
                         key={index}
