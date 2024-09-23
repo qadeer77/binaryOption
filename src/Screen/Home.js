@@ -76,6 +76,7 @@ const Home = ({ navigation }) => {
 
     // Saki10837882
     // mynameisknowledgebank@gmail.com
+    // com.pocketOption.co
 
     return (
         <>

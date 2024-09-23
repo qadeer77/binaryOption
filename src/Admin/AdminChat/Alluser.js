@@ -41,7 +41,6 @@ const Alluser = ({ navigation }) => {
 
         fetchUsers();
 
-        // Set up a real-time listener for changes in the 'chates' node
         const onValueChange = database().ref('chates').on('value', (snapshot) => {
             const usersData = snapshot.val() || {};
             const emails = Object.keys(usersData);
@@ -59,7 +58,6 @@ const Alluser = ({ navigation }) => {
             setUsersWithNewMessages(usersWithNewMessages);
         });
 
-        // Clean up the listener on component unmount
         return () => database().ref('chates').off('value', onValueChange);
     }, []);
 
@@ -78,13 +76,13 @@ const Alluser = ({ navigation }) => {
         setIsShow(!isShow);
         setData({ item, email });
 
-        // Reset the hasNewMessage field for the user when the admin opens the chat
         await database().ref('/chates/' + email).update({ hasNewMessage: false });
     };
 
     const renderItem = ({ item }) => {
         const email = item;
         const hasNewMessage = usersWithNewMessages.includes(email);
+        
 
         return (
             <TouchableOpacity style={styles.itemContainer} onPress={() => handleItem(item, email)}>

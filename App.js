@@ -46,6 +46,7 @@ function App() {
     const fetchToken = async () => {
       try {
         const token = await messaging().getToken();
+        
         const message = {
           title: 'Notification Title',
           body: 'Notification Body Content',

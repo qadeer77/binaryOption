@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import { AppColors } from '../../Constant/AppColor';
 import { ImagesPath } from '../../Constant/ImagePath';
 import CheckBox from '@react-native-community/checkbox';
@@ -19,9 +19,29 @@ const FxSignals = ({ navigation, refresh }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
     const [visibleChat, setVisibleChat] = useState(false);
+    const [tokens, setTokens] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
     }, [refresh]);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const usersCollection = await firestore()
+                    .collection('users')
+                    .get();
+
+                const usersList = usersCollection.docs.map(doc => doc.data());
+                const receivers = usersList.map(user => user.receiver).filter(receiver => receiver !== undefined);
+                setTokens(receivers);
+            } catch (error) {
+                console.error('Error fetching users: ', error);
+            }
+        };
+
+        fetchUsers();
+    }, []);
 
 
     const UploadImage = () => {
@@ -60,27 +80,74 @@ const FxSignals = ({ navigation, refresh }) => {
 
 
     const handleSend = async () => {
-        if (!signals) {
-            showToast('Signal message is empty');
-            return;
-        }
-
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
-
-        const signalData = {
-            text: signals,
-            dateTime: formattedDate,
-            premium: checked2
+        setLoading(true)
+        const body = {
+            tokens: tokens,
+            message: { title, body: message }
         };
 
-        try {
-            await firestore().collection('fxSignals').add(signalData);
-            console.log('Signal data saved successfully');
-            setSignals('');
-        } catch (error) {
-            console.error('Error saving signal data: ', error);
+        if (checked2) {
+            if (!signals) {
+                showToast('Signal message is empty');
+                setLoading(false);
+                return;
+            }
+
+            const currentDate = new Date();
+            const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+
+            const signalData = {
+                text: signals,
+                dateTime: formattedDate,
+                premium: checked2
+            };
+
+            try {
+                await firestore().collection('fxSignals').add(signalData);
+                console.log('Signal data saved successfully');
+                setSignals('');
+            } catch (error) {
+                console.error('Error saving signal data: ', error);
+            }
+        } else {
+            try {
+                const response = await fetch("https://binary-option-backahnd1.vercel.app/send-notification-multiple", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+
+                if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
+                console.log("Notification sent successfully:", await response.json());
+
+                if (!signals) {
+                    showToast('Signal message is empty');
+                    setLoading(false);
+                    return;
+                }
+
+                const currentDate = new Date();
+                const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+
+                const signalData = {
+                    text: signals,
+                    dateTime: formattedDate,
+                    premium: checked2
+                };
+
+                try {
+                    await firestore().collection('fxSignals').add(signalData);
+                    console.log('Signal data saved successfully');
+                    setSignals('');
+                } catch (error) {
+                    console.error('Error saving signal data: ', error);
+                }
+            } catch (error) {
+                console.error("Failed to send notification:", error);
+            }
         }
+        setLoading(false);
     };
 
     return (
@@ -179,7 +246,11 @@ const FxSignals = ({ navigation, refresh }) => {
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                            <Text style={styles.sendButtonText}>send</Text>
+                            {loading ? (
+                                <ActivityIndicator size="large" color='white' style={styles.loadingIndicator} />
+                            ) : (
+                                <Text style={styles.sendButtonText}>send</Text>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
